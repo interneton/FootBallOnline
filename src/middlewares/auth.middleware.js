@@ -18,7 +18,7 @@ export default async function (req, res, next) {
 
     const user = await prisma.User.findFirst({
       where: {
-        id: decoded.id
+        userId: decoded.userId
       }
     });
 

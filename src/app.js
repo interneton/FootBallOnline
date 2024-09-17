@@ -13,6 +13,7 @@ app.use(express.json());
 
 app.use('/players', playerRouter);
 app.use(ErrorHandlingMiddleware)
+
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
