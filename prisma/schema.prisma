@@ -41,6 +41,7 @@ model UserPlayer {
 model SoccerPlayer {
   soccerPlayerId Int           @id @default(autoincrement())
   name           String
+  rank           String        // 선수의 랭크
   speed          Int
   goalDecision   Int
   shootPower     Int

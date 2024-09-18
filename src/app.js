@@ -1,4 +1,5 @@
 import express from 'express';
+const shopRouter = require('./routes/shopRouter.js');
 
 const app = express();
 
