@@ -9,6 +9,7 @@ ex - 09.14 운전을 하루죙일하니 너무 피곤했다.
 저는 "너는 @검열@이라 개발자(작성자)의 의도를 모르는 걸 수도 있다"(by 현직개발자 친형) 라는 조언에 수정사항을 따로 적고,
 본 파일은 수정하지 않은 코드들로 이루어져있습니다.
 해당 코드들은 제가 실험할때는 수정 후 인 상태로 사용하고 마무리떄는 백업파일로 돌려놓고 수정사항을 작성했습니다.
+파일마다의 구분은 @@@@@@@@@@@ 과 상단의 파일명으로 구분해놓았습니다.
 
 파일의 구조
 footballonline/
@@ -29,13 +30,25 @@ footballonline/
 09.19 03:03 최종.
 Holyday 작업물. 가챠기능 단챠(1뽑),10연차 구현. 
 
-.prisma
+
+@@@@@@@@@@@@@@.prisma @@@@@@@@@@@@@@@@@@@
 만들면서 느낀건데 prisma에 pack부분이 없어도 될 것 같습니다.
 하지만 있었기에 사용했습니다.
 간결한 코드를 위해서라면 prisma에서 pack부분을 지워도 될것같습니다.
 코드 설명을 나눠서 하는거라면 pack부분이 있는게 나을 것 같습니다.
 
-.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql" // 사용하는 DB에 맞게 설정 (mysql, sqlite 등)
+  url      = env("DATABASE_URL")
+}
+DB는 연습하시는 계정에 맞게 입력하시면 됩니다.
+
+mongodb://USER:PASSWORD@HOST:PORT/DATABASE
+DATABASE_URL="mongodb://myuser:mypassword@localhost:27017/mydatabase"
+
 model UserPlayer {
   userPlayerId  Int           @id @default(autoincrement())
   userId        Int
@@ -70,14 +83,14 @@ model SoccerPlayer {
 }
 수정한 부분에 // 를 달아 뒀습니다. 
 이부분은 저도 잘 몰라서 현직 개발자에게 물어봤습니다.
-
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 package.json
 "name": "FootBallOnline", // 대문자 사용 때문에 에러가 난데요. football-online으로 수정하고싶습니다.
 .json파일에서 
 String does not match the pattern of "^(?:(?:@(?:[a-z0-9-*~][a-z0-9-*._~]*)?/[a-z0-9-._~])|[a-z0-9-~])[a-z0-9-._~]*$".
 에러가 났습니다.
 대문자 사용 때문에 에러가 난데요. football-online으로 수정하고 싶습니다.
-
+@@@@@@@@@@@@@@@@@@@@@@@@@@
 app.js
 원래는
 import shopRouter from './routes/shopRouter.js';
