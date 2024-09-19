@@ -50,10 +50,11 @@ export const getAllMyPlayer = async(userId)=>{
 }
 
 //장착된 선수
-export const equipList = async()=>{
+export const equipList = async(userId)=>{
   return await prisma.userPlayer.findMany({
     where:{
-      isEquipped :true,
+      isEquipped : true,
+      userId
     },
     select:{
       soccerPlayer: {

@@ -17,6 +17,7 @@ export const unequipPlayer = async (req, res, next) => {
   const { userId } = req.user;
   const { soccerPlayerId } = req.body;
   try {
+    const equip = await playerService.equipList(userId);
     const result = await playerService.unequipPlayer(userId, soccerPlayerId);
     res.status(200).json(result);
   } catch (error) {
