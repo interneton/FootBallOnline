@@ -9,6 +9,110 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  userId   Int    @id @default(autoincrement()) @map("userId")   // 사용자 ID, 자동 증가
+  account  String @map("account")                               // 사용자 계정
+  password String @map("password")                              // 사용자 비밀번호
+  cashId   Int    @unique @map("cashId")                        // 현금 ID
+
+  cash     Cash   @relation(fields: [cashId], references: [cashId]) // 현금 모델과의 관계
+  @@map("User")                                                 // 테이블 이름을 "User"로 매핑
+}
+
+model Cash {
+  cashId  Int @id @default(autoincrement()) @map("cashId")      // 현금 ID, 자동 증가
+  amount  Int @map("amount")                                    // 현금 금액
+
+  cashHistories CashHistory[]                                   // 현금 내역과의 관계
+
+  @@map("Cash")                                                 // 테이블 이름을 "Cash"로 매핑
+}
+
+model CashHistory {
+  cashHistoryId Int      @id @default(autoincrement()) @map("cashHistoryId") // 현금 내역 ID, 자동 증가
+  cashId        Int      @map("cashId")                                      // 현금 ID
+  amount        Int      @map("amount")                                      // 금액
+  createdAt     DateTime @default(now()) @map("createdAt")                   // 생성 시간, 기본값은 현재 시간
+
+  cash          Cash     @relation(fields: [cashId], references: [cashId])   // 현금 모델과의 관계
+  @@map("CashHistory")                                                       // 테이블 이름을 "CashHistory"로 매핑
+}
+
+model Pack {
+  packId      Int    @id @default(autoincrement()) @map("packId")            // 팩 ID, 자동 증가
+  name        String @map("name")                                            // 팩 이름
+  description String @map("description")                                     // 팩 설명
+  price       Int    @map("price")                                           // 팩 가격
+  probability Int    @map("probability")                                     // 팩 확률
+  rank        Int    @map("rank")                                            // 팩 등급
+  playerId    Int    @map("playerId")                                        // 선수 ID
+
+  player      SoccerPlayerInfo @relation(fields: [playerId], references: [soccerPlayerInfoId]) // 축구 선수 정보 모델과의 관계
+  @@map("Pack")                                                              // 테이블 이름을 "Pack"으로 매핑
+}
+
+model UserInfo {
+  userInfoId Int    @id @default(autoincrement()) @map("userInfoId")         // 사용자 정보 ID, 자동 증가
+  name       String @map("name")                                             // 사용자 이름
+  age        Int    @map("age")                                              // 사용자 나이
+  userId     Int    @map("userId")                                           // 사용자 ID
+
+  user       User   @relation(fields: [userId], references: [userId])        // 사용자 모델과의 관계
+  @@map("UserInfo")                                                          // 테이블 이름을 "UserInfo"로 매핑
+}
+
+model SoccerPlayerInfo {
+  soccerPlayerInfoId Int    @id @default(autoincrement()) @map("soccerPlayerInfoId") // 축구 선수 정보 ID, 자동 증가
+  name               String @map("name")                                             // 선수 이름
+  speed              Int    @map("speed")                                            // 선수 속도
+  goalDecision       Int    @map("goalDecision")                                     // 골 결정력
+  shootPower         Int    @map("shootPower")                                       // 슛 파워
+  defense            Int    @map("defense")                                          // 수비력
+  stamina            Int    @map("stamina")                                          // 체력
+  rank               Int    @map("rank")                                             // 선수 등급
+
+  batchTeams    TeamBatchPlayers[]                                                   // 팀 배치 선수들과의 관계
+  invenTeams    TeamInvenPlayers[]                                                   // 팀 인벤 선수들과의 관계
+  @@map("SoccerPlayerInfo")                                                          // 테이블 이름을 "SoccerPlayerInfo"로 매핑
+}
+
+model Team {
+  teamId        Int    @id @default(autoincrement()) @map("teamId")                   // 팀 ID, 자동 증가
+  name          String @map("name")                                                   // 팀 이름
+  rank          Int    @map("rank")                                                   // 팀 등급
+  userId        Int    @map("userId")                                                 // 사용자 ID
+ 
+  user          User   @relation(fields: [userId], references: [userId])              // 사용자 모델과의 관계
+  
+  batchPlayers  TeamBatchPlayers[]                                                    // 팀 배치 선수들과의 관계
+  invenPlayers  TeamInvenPlayers[]                                                    // 팀 인벤 선수들과의 관계
+  @@map("Team")                                                                       // 테이블 이름을 "Team"으로 매핑
+}
+
+model TeamBatchPlayers {
+  teamId             Int @map("teamId")                                               // 팀 ID
+  soccerPlayerInfoId Int @map("soccerPlayerInfoId")                                   // 축구 선수 정보 ID
+
+  team              Team             @relation(fields: [teamId], references: [teamId]) // 팀 모델과의 관계
+  player            SoccerPlayerInfo @relation(fields: [soccerPlayerInfoId], references: [soccerPlayerInfoId]) // 축구 선수 정보 모델과의 관계
+
+  @@id([teamId, soccerPlayerInfoId])                                                  // 복합 기본 키 설정
+
+  @@map("TeamBatchPlayers")                                                           // 테이블 이름을 "TeamBatchPlayers"로 매핑
+}
+
+model TeamInvenPlayers {
+  teamId             Int @map("teamId")                                               // 팀 ID
+  soccerPlayerInfoId Int @map("soccerPlayerInfoId")                                   // 축구 선수 정보 ID
+
+  team              Team             @relation(fields: [teamId], references: [teamId]) // 팀 모델과의 관계
+  player            SoccerPlayerInfo @relation(fields: [soccerPlayerInfoId], references: [soccerPlayerInfoId]) // 축구 선수 정보 모델과의 관계
+
+  @@id([teamId, soccerPlayerInfoId])                                                  // 복합 기본 키 설정
+
+  @@map("TeamInvenPlayers")                                                           // 테이블 이름을 "TeamInvenPlayers"로 매핑
 }
