@@ -1,89 +1,65 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql" // 사용하는 DB에 맞게 설정 (mysql, sqlite 등)
+  provider = "postgresql" // 사용하는 DB에 맞게 설정 (mysql, sqlite 등)
   url      = env("DATABASE_URL")
 }
 
 model User {
-  userId      Int          @id @default(autoincrement()) @map("user_id")
-  cashId      Int                                        @map("cash_id")
-  account     String                                     @map("account")
-  password    String                                     @map("password")
-  name        String                                     @map("name")
-  cashAmount  Int          @default(1000)                @map("cash_amount") // 기본 캐시 설정
-  teamName    String       @map("team_name")
-
+  userId      Int          @id @default(autoincrement())
+  cashId      Int
+  account     String
+  password    String
+  name        String
+  cashAmount  Int          @default(1000) // 기본 캐시 설정
+  teamName    String
   userPlayers UserPlayer[]
   matches     MatchManager[]
-
-  @@map("user")
 }
 
 model MatchManager {
-  id          Int      @id @default(autoincrement()) @map("id")
-  winCount    Int      @default(0)                   @map("win_count")  // 승리 카운트
-  lossCount   Int      @default(0)                   @map("loss_count")  // 패배 카운트
-  drawCount   Int      @default(0)                   @map("draw_count")  // 무승부 카운트
-  userId      Int                                    @map("user_id")
-
+  id          Int      @id @default(autoincrement())
+  winCount    Int      @default(0)  // 승리 카운트
+  lossCount   Int      @default(0)  // 패배 카운트
+  drawCount   Int      @default(0)  // 무승부 카운트
+  userId      Int
   user        User     @relation(fields: [userId], references: [userId])
-
-  @@map("match_manager")
 }
 
 model UserPlayer {
-  userPlayerId    Int           @id @default(autoincrement()) @map("user_player_id")
-  userId          Int                                         @map("user_id")
-  soccerPlayerId  Int                                         @map("soccer_player")
-  isEquipped      Boolean       @default(false)               @map("is_equipped")
-
-  user            User          @relation(fields: [userId], references: [userId])
-  soccerPlayer    SoccerPlayer  @relation(fields: [soccerPlayerId], references: [soccerPlayerId])
-
-  @@map("user_player")
+  userPlayerId  Int           @id @default(autoincrement())
+  userId        Int
+  soccerPlayer  Int
+  isEquipped    Boolean       @default(false)
+  user          User          @relation(fields: [userId], references: [userId])
+  soccerPlayer  SoccerPlayer  @relation(fields: [soccerPlayer], references: [soccerPlayerId])
 }
 
 model SoccerPlayer {
-  soccerPlayerId Int           @id @default(autoincrement()) @map("soccer_player_id")
-  name           String                                      @map("name")
-  speed          Int                                         @map("speed")
-  goalDecision   Int                                         @map("goal_decision")
-  shootPower     Int                                         @map("shoot_power")
-  defense        Int                                         @map("defense")
-  stamina        Int                                         @map("stamina")
+  soccerPlayerId Int           @id @default(autoincrement())
+  name           String
+  speed          Int
+  goalDecision   Int
+  shootPower     Int
+  defense        Int
+  stamina        Int
   packs          PackPlayer[]
-  userPlayers    UserPlayer[] 
-
-  @@map("soccer_player")
 }
 
 model Pack {
-  
-  id             Int           @id @default(autoincrement()) @map("id")
-  name           String                                      @map("name")
-  price          Int                                         @map("price")
+  id             Int           @id @default(autoincrement())
+  name           String
+  price          Int
   players        PackPlayer[]
-
-  @@map("pack")
 }
 
 model PackPlayer {
-  id             Int           @id @default(autoincrement()) @map("id")
-  packId         Int                                         @map("pack_id")
-  soccerPlayerId Int                                         @map("soccer_player_id")
-  probability    Float                                       @map("probability") // 확률
-
+  id             Int           @id @default(autoincrement())
+  packId         Int
+  soccerPlayerId Int
+  probability    Float         // 확률
   pack           Pack          @relation(fields: [packId], references: [id])
   soccerPlayer   SoccerPlayer  @relation(fields: [soccerPlayerId], references: [soccerPlayerId])
-
-  @@map("pack_player")
 }
