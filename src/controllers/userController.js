@@ -2,6 +2,16 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
+// Access Token 생성
+function createAccessToken(id) {
+  return jwt.sign({ id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+}
+
+// Refresh Token 생성
+function createRefreshToken(id) {
+  return jwt.sign({ id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
+}
+
 export const registerUser = async (req, res, next) => {
   try {
     const { account, password, name, teamName } = req.body;
@@ -30,8 +40,11 @@ export const loginUser = async (req, res, next) => {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).json({ message: '비밀번호가 틀립니다.' });
   
-      // JWT 생성
-      const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+      const accessToken = createAccessToken(user._id);
+      const refreshToken = createRefreshToken(user._id);
+
+      res.cookie('accessToken', accessToken, { httpOnly: true });
+      res.cookie('refreshToken', refreshToken, { httpOnly: true });
   
       res.status(200).json({ message: '로그인 성공', token });
     } catch (error) {
