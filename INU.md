@@ -98,3 +98,18 @@ import shopRouter from './routes/shopRouter.js';
 json파일에 type = module이 안달려있길래 그냥 const 로 박아뒀습니다.
 const shopRouter = require('./routes/shopRouter.js');
 type = module을 추가하실 거라면 제게 한번만 말씀해 주시길 바랍니다. 해당코드에 맞춰 코드들을 수정하겠습니다.
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@
+단챠 요청
+{
+  "userId": 1,
+  "packId": 2,
+  "isContinuous": false
+}
+연챠 요청
+{
+  "userId": 1,
+  "packId": 2,
+  "isContinuous": true
+}
