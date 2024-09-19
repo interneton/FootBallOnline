@@ -3,63 +3,80 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql" // 사용하는 DB에 맞게 설정 (mysql, sqlite 등)
+  provider = "mysql" // 사용하는 DB에 맞게 설정 (mysql, sqlite 등)
   url      = env("DATABASE_URL")
 }
 
 model User {
-  userId      Int          @id @default(autoincrement())
-  cashId      Int
-  account     String
-  password    String
-  name        String
-  cashAmount  Int          @default(1000) // 기본 캐시 설정
-  teamName    String
-  userPlayers UserPlayer[]
-  matches     MatchManager[]
+  userId      Int          @id @default(autoincrement()) @map("user_id")
+  account     String       @map("account")
+  password    String       @map("password")
+  name        String       @map("name")
+  cashAmount  Int          @default(1000) @map("cash_amount") // 기본 캐시 설정
+  teamName    String       @map("team_name")
+
+  userPlayers UserPlayer[] 
+  matchManager MatchManager[] // MatchManager와의 관계 추가
+
+  @@map("users")
 }
 
 model MatchManager {
-  id          Int      @id @default(autoincrement())
-  winCount    Int      @default(0)  // 승리 카운트
-  lossCount   Int      @default(0)  // 패배 카운트
-  drawCount   Int      @default(0)  // 무승부 카운트
-  userId      Int
+  id          Int      @id @default(autoincrement()) @map("id")
+  winCount    Int      @default(0) @map("win_count")  // 승리 카운트
+  lossCount   Int      @default(0) @map("loss_count")  // 패배 카운트
+  drawCount   Int      @default(0) @map("draw_count")  // 무승부 카운트
+  userId      Int      @map("user_id")
+
   user        User     @relation(fields: [userId], references: [userId])
+  @@map("match_managers")
 }
 
 model UserPlayer {
-  userPlayerId  Int           @id @default(autoincrement())
-  userId        Int
-  soccerPlayer  Int
-  isEquipped    Boolean       @default(false)
+  userPlayerId  Int           @id @default(autoincrement()) @map("user_player_id")
+  userId        Int           @map("user_id")
+  soccerPlayerId Int          @map("soccer_player_id")
+  isEquipped    Boolean       @default(false) @map("is_equipped")
+
   user          User          @relation(fields: [userId], references: [userId])
-  soccerPlayer  SoccerPlayer  @relation(fields: [soccerPlayer], references: [soccerPlayerId])
+  soccerPlayer  SoccerPlayer  @relation(fields: [soccerPlayerId], references: [soccerPlayerId])
+
+  @@map("user_players")
 }
 
 model SoccerPlayer {
-  soccerPlayerId Int           @id @default(autoincrement())
-  name           String
-  speed          Int
-  goalDecision   Int
-  shootPower     Int
-  defense        Int
-  stamina        Int
-  packs          PackPlayer[]
+  soccerPlayerId Int           @id @default(autoincrement()) @map("soccer_player_id")
+  name           String        @map("name")
+  speed          Int           @map("speed")
+  goalDecision   Int           @map("goal_decision")
+  shootPower     Int           @map("shoot_power")
+  defense        Int           @map("defense")
+  stamina        Int           @map("stamina")
+  rank           String        @map("rank")
+
+  userPlayers    UserPlayer[]  
+  @@map("soccer_players")
 }
 
 model Pack {
-  id             Int           @id @default(autoincrement())
-  name           String
-  price          Int
-  players        PackPlayer[]
+  id             Int           @id @default(autoincrement()) @map("id")
+  name           String        @map("name")
+  price          Int           @map("price")
+  SSPB           Int           @map("sspb")
+  APB            Int           @map("apb")
+  BPB            Int           @map("bpb")
+  CPB            Int           @map("cpb")
+  FPB            Int           @map("fpb")
+
+  @@map("packs")
 }
 
-model PackPlayer {
-  id             Int           @id @default(autoincrement())
-  packId         Int
-  soccerPlayerId Int
-  probability    Float         // 확률
-  pack           Pack          @relation(fields: [packId], references: [id])
-  soccerPlayer   SoccerPlayer  @relation(fields: [soccerPlayerId], references: [soccerPlayerId])
+model FightRecord {
+  id             Int           @id @default(autoincrement()) @map("id")
+  username       String        @map("username")
+  opponentname   String        @map("opponentname")
+  result         String        @map("result")
+  createdAt      DateTime      @default(now()) @map("created_at")
+
+  @@map("fight_records")
 }

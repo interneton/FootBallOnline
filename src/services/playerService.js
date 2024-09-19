@@ -70,3 +70,18 @@ export const equipList = async(userId)=>{
     }
   })
 }
+
+//특정 랭크 선수 조회
+export const getPlayersByRank = async(rank) => {
+  return await prisma.soccerPlayer.findMany({
+    where: { rank },
+    select: {
+      name: true,
+      speed: true,
+      goalDecision: true,
+      shootPower: true,
+      defense: true,
+      stamina: true
+    }
+  });
+}
