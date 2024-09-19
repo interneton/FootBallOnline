@@ -18,12 +18,35 @@ export const unequipPlayer = async (userId, soccerPlayerId) => {
 
 // 모든 선수 능력치 조회
 export const getAllPlayerStats = async () => {
-  return await prisma.soccerPlayer.findMany();
+  return await prisma.soccerPlayer.findMany({
+    select: {
+      name: true,
+      speed: true,
+      goalDecision: true,
+      shootPower: true,
+      defense: true,
+      stamina: true
+    }
+  });
 };
 
-// 자기 자신의 선수 명단 조회
-export const getAllMyPlayer = async()=>{
-    return await prisma.userPlayer.findMany();
+// 자기 자신의 선수 명단 및 능력치 조회
+export const getAllMyPlayer = async(userId)=>{
+    return await prisma.userPlayer.findMany({
+      where: { userId },
+      select:{
+        soccerPlayer: {
+          select: {
+            name: true,
+            speed: true,
+            goalDecision: true,
+            shootPower: true,
+            defense: true,
+            stamina: true
+          }
+        }
+      }
+    });
 }
 
 //장착된 선수
@@ -31,6 +54,18 @@ export const equipList = async()=>{
   return await prisma.userPlayer.findMany({
     where:{
       isEquipped :true,
+    },
+    select:{
+      soccerPlayer: {
+        select: {
+          name: true,
+          speed: true,
+          goalDecision: true,
+          shootPower: true,
+          defense: true,
+          stamina: true
+        }
+      }
     }
   })
 }
