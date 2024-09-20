@@ -1,6 +1,6 @@
 import express from "express";
 import { equipPlayer, unequipPlayer, getAllPlayerStats} from "../controllers/playercontroller.js";
-import authMiddleware from "../middlewares/auth.middleware";
+import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 

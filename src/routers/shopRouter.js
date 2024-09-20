@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { purchaseCash, getCashAmount, drawPlayer } from '../controllers/shopController.js';
-import authMiddleware from "../middlewares/auth.middleware";
+import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

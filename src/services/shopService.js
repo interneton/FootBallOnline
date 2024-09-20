@@ -1,5 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { prisma } from "../utils/prisma/index.js";
 
 //전체 팩 정보 조회
 export const getPackInfo = async () => {
@@ -17,7 +16,7 @@ export const getPackInfo = async () => {
 };
 
 // 캐시 구매 및 사용
-export const purchaseCash = async (userId, amount) => {
+export const purch = async (userId, amount) => {
   return await prisma.user.update({
     where: { userId },
     data: { cashAmount: amount },
@@ -25,7 +24,7 @@ export const purchaseCash = async (userId, amount) => {
 };
 
 // 현재 캐시 잔액 조회
-export const getCashAmount = async (userId) => {
+export const getCash = async (userId) => {
   const user = await prisma.user.findUnique({
     where: { userId },
     select: { cashAmount: true },

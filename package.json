@@ -1,8 +1,12 @@
 {
-  "name": "FootBallOnline",
+  "name": "footballonline",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "license": "MIT",
+  "scripts": {
+    "start": "nodemon ./src/app.js"
+  },
   "dependencies": {
     "@prisma/client": "^5.19.1",
     "bcrypt": "^5.1.1",
@@ -11,5 +15,8 @@
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",
     "prisma": "^5.19.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.6"
   }
 }

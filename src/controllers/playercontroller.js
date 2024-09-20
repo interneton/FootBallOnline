@@ -1,4 +1,4 @@
-import * as playerService from "../services/playerService";
+import * as playerService from "../services/playerService.js";
 
 // 선수 장착
 export const equipPlayer = async (req, res, next) => {
