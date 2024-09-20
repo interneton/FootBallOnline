@@ -46,3 +46,30 @@ export const getAllPlayerStats = async (req, res, next) => {
     next(error); // 에러를 next로 전달
   }
 };
+
+// 선수 만들기
+export const createPlayer = async (req, res, next) => {
+  const { name, speed, goalDecision, shootPower, defense, stamina, rank } = req.body;
+
+  try {
+    const existingPlayer = await playerService.getPlayerByName(name);
+    if (existingPlayer&&existingPlayer.rank === rank) {
+      throw new Error("이름이 같은 선수가 이미 존재합니다.");
+    }
+    const newPlayer = await 
+    playerService.createPlayer({
+      name,
+      speed,
+      goalDecision,
+      shootPower,
+      defense,
+      stamina,
+      rank
+    });
+
+    res.status(201).json({ message: "선수 생성 완료", player: newPlayer });
+  } catch (error) {
+    next(error); // 에러를 next로 전달
+  }
+};
+

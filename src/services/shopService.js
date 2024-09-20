@@ -6,11 +6,11 @@ export const getPackInfo = async () => {
     select: {
       name: true,
       price: true,
-      SSPB: true,
-      APB: true,
-      BPB: true,
-      CPB: true,
-      FPB: true,
+      sspb: true,
+      apb: true,
+      bpb: true,
+      cpb: true,
+      fpb: true,
     },
   });
 };
@@ -39,11 +39,26 @@ export const getPackInfoOne = async(id)=>{
         select: {
             name: true,
             price: true,
-            SSPB: true,
-            APB: true,
-            BPB: true,
-            CPB: true,
-            FPB: true,
+            sspb: true,
+            apb: true,
+            bpb: true,
+            cpb: true,
+            fpb: true,
         },
     });
 }
+
+export const makePack = async (packname, sspb, apb, bpb, cpb, fpb, price) => {
+  return await prisma.pack.create({
+    data: {
+      name: packname,
+      sspb: sspb,
+      apb: apb,
+      bpb: bpb,
+      cpb: cpb,
+      fpb: fpb,
+      price: price
+      
+    },
+  });
+};

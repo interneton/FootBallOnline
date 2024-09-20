@@ -1,4 +1,4 @@
-import { getPackInfo,getPackInfoOne,purch,getCash } from "../services/shopService.js";
+import { getPackInfo,getPackInfoOne,purch,getCash,makePack } from "../services/shopService.js";
 import { getPlayersByRank } from "../services/playerService.js"
 
 // 게임 내 캐시 구매
@@ -41,10 +41,11 @@ export const drawPlayer = async (req, res, next) => {
     let probability = Math.floor(Math.random() * 100);
     let player;
 
-    if (probability < pack.SSPB) player = "S";
-    else if (probability < pack.SSPB + pack.APB)player = "A";
-    else if (probability < pack.SSPB + pack.APB + pack.BPB) player = "B";
-    else if (probability < pack.SSPB + pack.APB + pack.BPB + pack.CPB) player = "C";
+    //확률 
+    if (probability < pack.sspb) player = "S";
+    else if (probability < pack.sspb + pack.apb)player = "A";
+    else if (probability < pack.sspb + pack.apb + pack.bpb) player = "B";
+    else if (probability < pack.sspb + pack.apb + pack.bpb + pack.cpb) player = "C";
     else player = "F";
     
     let rankPlay = await getPlayersByRank(player);
@@ -53,7 +54,7 @@ export const drawPlayer = async (req, res, next) => {
     const randomIndex = Math.floor(Math.random() * rankPlay.length);
     const selectedPlayer = rankPlay[randomIndex];
 
-    await equipPlayer(userId, selectedPlayer.soccerPlayerId);
+    await createUserPlayer(userId, selectedPlayer.soccerPlayerId);
     await purch(userId, currentCash - pack.price);
 
     res.status(200).json({ message: "선수 뽑기 완료", player });
@@ -64,4 +65,20 @@ export const drawPlayer = async (req, res, next) => {
 
 
 //팩 만들기
-export const makePack = async (req,res,next)
+export const makePackcontroller = async (req,res,next)=>{
+  const { packname, sspb, apb, bpb, cpb, fpb, price } = req.body;
+  try {
+    if (isNaN(sspb) || isNaN(apb) || isNaN(bpb) || isNaN(cpb) || isNaN(fpb) || isNaN(price)) throw new Error("확률에 정확한 숫자를 적으십시오.");
+    
+    const allprobability = sspb+apb+bpb+cpb+fpb;
+
+    if(Number(allprobability)!==100)throw new Error("확률이 맞지 않습니다.");
+
+    const packdata = makePack(packname,sspb,apb,bpb,cpb,fpb,price);
+
+    return res.status(201).json({message:"팩 생성 완료",packdata})
+  }
+  catch(error){
+    next(error)
+  }
+}

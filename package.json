@@ -17,6 +17,7 @@
     "prisma": "^5.19.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.6"
+    "nodemon": "^3.1.6",
+    "prettier": "^3.3.3"
   }
 }

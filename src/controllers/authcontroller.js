@@ -9,23 +9,22 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 export const signup = async (req, res, next) => {
-    const { email, password } = req.body;
-    const regex = /^[a-z0-9]+$/; //정규표현식 사용
-    const passwordregex = /^.{6,}$/;
+    const { email, password, name, teamname } = req.body;
+    const emailRegex = /^[a-z0-9]+$/; // 정규표현식 사용
+    const passwordRegex = /^.{6,}$/;
 
     try {
-
-        if (!regex.test(userId)) throw new Error("유효하지 않은 아이디입니다.");
-        if (!passwordregex.test(password)) throw new Error("유효하지 않은 비밀번호입니다.");
+        if (!emailRegex.test(email)) throw new Error("유효하지 않은 이메일입니다.");
+        if (!passwordRegex.test(password)) throw new Error("유효하지 않은 비밀번호입니다.");
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const isuseremail = await getUser(email);
+        const isUserEmail = await getUser(email);
 
-        if (isuseremail) throw new Error("이 아이디를 사용할 수 없습니다.")
+        if (isUserEmail) throw new Error("이 이메일을 사용할 수 없습니다.");
         
-        const newUser = await createUser(email, hashedPassword);
+        const newUser = await createUser(email, hashedPassword, name, teamname);
 
-        return res.status(201).json({ message: "회원가입 성공",newUser });
+        return res.status(201).json({ message: "회원가입 성공" });
         
     } catch (error) {
         next(error);

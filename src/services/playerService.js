@@ -85,3 +85,47 @@ export const getPlayersByRank = async(rank) => {
     }
   });
 }
+
+export const createUserPlayer = async (userId, soccerPlayerId) => {
+  return await prisma.userPlayer.create({
+    data: {
+      userId,
+      soccerPlayerId,
+      isEquipped: false
+    }
+  });
+}
+
+export const getRandomPlayer = async (userId) => {
+  const players = await prisma.soccerPlayer.findMany({
+    where: {
+      NOT: {
+        userId: userId
+      }
+    }
+  });
+  const randomIndex = Math.floor(Math.random() * players.length);
+  return players[randomIndex];
+};
+
+export const createPlayer = async (playerData) => {
+  return await prisma.soccerPlayer.create({
+    data: playerData
+  });
+}
+
+// 특정 이름으로 선수 확인
+export const getPlayerByName = async (name) => {
+  return await prisma.soccerPlayer.findFirst({
+    where: { name },
+    select: {
+      name: true,
+      speed: true,
+      goalDecision: true,
+      shootPower: true,
+      defense: true,
+      stamina: true,
+      rank : true,
+    }
+  });
+}
