@@ -48,6 +48,7 @@ export const getPackInfoOne = async(id)=>{
     });
 }
 
+//팩 만들기
 export const makePack = async (packname, sspb, apb, bpb, cpb, fpb, price) => {
   return await prisma.pack.create({
     data: {
