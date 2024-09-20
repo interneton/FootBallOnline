@@ -37,3 +37,17 @@ export const recordMatchResult = async (userId, result) => {
         throw error;
     }
 };
+
+
+export const getUsername = async (userId) => {
+    try {
+        const user = await prisma.user.findFirst({
+            where: { userId: userId },
+            select: { name: true },
+        });
+        return user?.name || null;
+    } catch (error) {
+        console.error("userId로 사용자 닉네임 조회 중 오류 발생:", error);
+        throw error;
+    }
+};

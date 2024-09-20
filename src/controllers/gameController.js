@@ -1,6 +1,5 @@
 import { getRandomPlayer, equipList } from '../services/playerService.js';
-import { recordMatchResult } from '../services/matchService.js';
-import { getUsername } from '../services/authService.js';
+import { recordMatchResult ,getUsername} from '../services/gameService.js';
 
 export const playGame = async (req, res, next) => {
   try {
