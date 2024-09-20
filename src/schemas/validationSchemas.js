@@ -1,5 +1,12 @@
 import Joi from 'joi';
 
+// 게임 스키마
+export const playGameSchema = Joi.object({
+  userId: Joi.number().integer().required(),
+  result: Joi.string().valid('win', 'loss', 'draw').required()
+});
+
+// 플레이어
 export const equipPlayerSchema = Joi.object({
   userId: Joi.number().integer().required(),
   soccerPlayerId: Joi.number().integer().required()
@@ -23,4 +30,22 @@ export const registerPlayerSchema = Joi.object({
   shootPower: Joi.number().integer().min(0).max(100).required(),
   defense: Joi.number().integer().min(0).max(100).required(),
   stamina: Joi.number().integer().min(0).max(100).required(),
+});
+
+// 상점 스키마
+export const purchaseCashSchema = Joi.object({
+  userId: Joi.number().integer().required(),
+  amount: Joi.number().integer().min(1).required()
+});
+
+export const drawPlayerSchema = Joi.object({
+  packId: Joi.number().integer().required()
+});
+
+// 사용자 스키마
+export const signUpSchema = Joi.object({
+  account: Joi.string().email().required(),
+  password: Joi.string().min(6).required(),
+  name: Joi.string().min(3).required(),
+  teamName: Joi.string().min(3).required()
 });
