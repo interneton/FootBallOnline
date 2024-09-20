@@ -5,11 +5,13 @@ import playerRouter from './routes/playerRouter.js';
 import gameRouter from './routes/gameRouter.js';
 import shopRouter from './routes/shopRouter.js';
 import { errorHandler } from './middlewares/errorMiddleware.js';
+import { logMiddleware } from './middlewares/logMiddleware.js';
 
 import YAML from 'yamljs';
 
 const app = express();
 app.use(express.json());
+app.use(logMiddleware)
 
 const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
