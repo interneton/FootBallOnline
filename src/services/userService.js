@@ -2,7 +2,6 @@ import { prisma } from "../utils/prisma/client.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-const prisma = new PrismaClient();
 
 // Access Token 생성
 export const createAccessToken = (userId) => {

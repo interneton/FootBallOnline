@@ -1,4 +1,4 @@
-const logMiddleware = (req, res, next) => {
+export const logMiddleware = (req, res, next) => {
     const startTime = Date.now(); // 요청 시작 시간 기록
   
     // 요청 정보를 로그로 기록
@@ -14,4 +14,3 @@ const logMiddleware = (req, res, next) => {
     next();
   };
   
-  export default logMiddleware;
