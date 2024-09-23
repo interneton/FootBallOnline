@@ -1,4 +1,4 @@
-import { prisma } from "../utils/prisma/index.js";
+import { prisma } from "../utils/prisma/client.js";
 
 //전체 팩 정보 조회
 export const getPackInfo = async () => {
