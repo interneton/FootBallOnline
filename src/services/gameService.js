@@ -1,4 +1,4 @@
-import { prisma } from "../utils/prisma/index.js";
+import { prisma } from "../utils/prisma/client.js";
 
 export const recordMatchResult = async (userId, opponentId, result, username, opponentname) => {
     try {
