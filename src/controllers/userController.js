@@ -1,4 +1,4 @@
-import { signupService, loginService, createAccessToken, createRefreshToken } from './userService.js';
+import { signupService, loginService, createAccessToken, createRefreshToken } from '../services/userService.js';
 
 export const signup = async (req, res) => {
   try {
@@ -17,9 +17,6 @@ export const login = async (req, res) => {
 
     const accessToken = createAccessToken(user.userId);
     const refreshToken = createRefreshToken(user.userId);
-
-    res.cookie('accessToken', accessToken, { httpOnly: true });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true });
 
     res.status(200).json({ message: '로그인 성공', accessToken, refreshToken });
   } catch (error) {

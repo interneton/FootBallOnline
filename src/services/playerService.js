@@ -1,4 +1,4 @@
-import { prisma } from "../utils/prisma/index.js";
+import { prisma } from "../utils/prisma/client.js";
 
 // 선수 장착
 export const equipPlayer = async (userId, soccerPlayerId) => {
