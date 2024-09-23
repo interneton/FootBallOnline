@@ -99,7 +99,11 @@ export const createUserPlayer = async (userId, soccerPlayerId) => {
 }
 
 export const getRandomUser = async (userId) => {
-  const userScore = (await prisma.user.findFirst({ where: { userId } })).score;
+  const user = await prisma.user.findFirst({ where: { userId } });
+  if (!user) {
+    throw new Error('User not found');
+  }
+  const userScore = user.score;
   let players = await prisma.user.findMany({
     where: {
       NOT: {
@@ -111,7 +115,6 @@ export const getRandomUser = async (userId) => {
       }
     }
   });
-
   for (let i = 0; i < players.length; i++) {
     const playerCount = await prisma.userPlayer.count({
       where: {
@@ -123,8 +126,9 @@ export const getRandomUser = async (userId) => {
       players[i] = null;
     }
   }
-
+  
   players = players.filter(player => player !== null);
+  console.log(players);
   return players;
 };
 

@@ -2,7 +2,7 @@ import { prisma } from "../utils/prisma/client.js";
 
 export const recordMatchResult = async (userId, opponentId, result, username, opponentname) => {
     try {
-        let matchManager = await prisma.matchManager.findUnique({
+        let matchManager = await prisma.matchManager.findFirst({
             where: { userId: userId },
         });
 
@@ -17,7 +17,7 @@ export const recordMatchResult = async (userId, opponentId, result, username, op
             });
         }
 
-        let opponentMatchManager = await prisma.matchManager.findUnique({
+        let opponentMatchManager = await prisma.matchManager.findFirst({
             where: { userId: opponentId },
         });
 
@@ -63,12 +63,12 @@ export const recordMatchResult = async (userId, opponentId, result, username, op
         }
 
         await prisma.matchManager.update({
-            where: { userId: userId },
+            where: { id: matchManager.id }, // userId 대신 id 사용
             data: updateData,
         });
 
         await prisma.matchManager.update({
-            where: { userId: opponentId },
+            where: { id: opponentMatchManager.id }, // userId 대신 id 사용
             data: opponentUpdateData,
         });
 

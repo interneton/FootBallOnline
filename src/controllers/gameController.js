@@ -4,9 +4,9 @@ import { CustomError } from '../utils/customError.js';
 
 export const playGame = async (req, res, next) => {
   try {
-    const userId = req.user.id;
+    const userId = req.user.userId;
     const username = await getUsername(userId);
-    
+    console.log(userId)
     // 유저와 상대방의 장착된 선수들의 스탯 합산
     const userPlayers = await equipList(userId);
     if (userPlayers.length < 3) {
@@ -14,11 +14,14 @@ export const playGame = async (req, res, next) => {
     }
 
     const Players = await getRandomUser(userId);
+    if (Players.length === 0) {
+      throw new CustomError("상대방 유저를 찾을 수 없습니다.", 400);
+    }
+    
     let randomIndex = Math.floor(Math.random() * Players.length);
     let opponentUser = Players[randomIndex];
     let opponentname = await getUsername(opponentUser.userId);
     let opponentPlayers = await equipList(opponentUser.userId);
-
 
     let attempts = 0;
     const maxAttempts = 50;
