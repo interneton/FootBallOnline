@@ -48,3 +48,35 @@ export const openConsole = (page) => {
             consoleOutput.innerHTML = '잘못된 페이지입니다.';
     }
 };
+
+document.getElementById('playGameBtn').addEventListener('click', async () => {
+    // 게임 API
+});
+
+document.getElementById('purchaseCashBtn').addEventListener('click', async () => {
+    // 캐쉬 상점 APi를 넣어야하는디...
+});
+
+document.getElementById('drawPlayerBtn').addEventListener('click', async () => {
+    // 가챠 드로우플레이어 API
+});
+
+document.getElementById('equipPlayerBtn').addEventListener('click', async () => {
+    // 플레이어 장착 API
+});
+
+document.getElementById('unequipPlayerBtn').addEventListener('click', async () => {
+    // 장착해제 API
+});
+
+// 랭킹과 플레이어 로드 기능
+async function loadRankings() {
+    // API에서 랭킹가져오는 뭐시깽이
+}
+
+async function loadPlayers() {
+    // API에서 플레이어를 가져오는 뭐시꺵이
+}
+
+loadRankings();
+loadPlayers();
