@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Football Online - 로그인 및 회원가입</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Football Online</h1>
+  </header>
+
+  <main>
+    <!-- 로그인 섹션 -->
+    <section id="auth-section">
+      <h2>로그인</h2>
+      <div id="login-form">
+        <h3>로그인</h3>
+        <form id="loginForm">
+          <label for="login-account">이메일:</label>
+          <input type="email" id="login-account" name="account" required>
+          <label for="login-password">비밀번호:</label>
+          <input type="password" id="login-password" name="password" required>
+          <button type="submit" class="btn">로그인</button>
+        </form>
+        <p id="login-message"></p>
+      </div>
+    </section>
+
+    <!-- 회원가입 섹션 -->
+    <section id="signup-section">
+      <h2>회원가입</h2>
+      <div id="signup-form">
+        <h3>회원가입</h3>
+        <form id="signupForm">
+          <label for="signup-account">이메일:</label>
+          <input type="email" id="signup-account" name="account" required>
+          <label for="signup-password">비밀번호:</label>
+          <input type="password" id="signup-password" name="password" required>
+          <br><label for="signup-name">이름:</label>
+          <input type="text" id="signup-name" name="name" required>
+          <label for="signup-teamName">팀 이름:</label>
+          <input type="text" id="signup-teamName" name="teamName" required>
+          <button type="submit" class="btn">회원가입</button>
+        </form>
+        <p id="signup-message"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2024 Football Online</p>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const baseUrl = 'http://localhost:3000'; // 백엔드 API 주소
+
+      // 로그인 처리
+      document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+        const account = document.getElementById('login-account').value;
+        const password = document.getElementById('login-password').value;
+
+        try {
+          const response = await fetch(`${baseUrl}/users/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ account, password }), // 요청 본문에 이메일과 비밀번호 포함
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`로그인 실패: ${errorText}`);
+          }
+
+          const { accessToken, refreshToken } = await response.json();
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
+          document.getElementById('login-message').textContent = '로그인 성공!';
+        } catch (error) {
+          document.getElementById('login-message').textContent = `오류: ${error.message}`;
+        }
+      });
+
+      // 회원가입 처리
+      document.getElementById('signupForm').addEventListener('submit', async (e) => {
+        e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+        const account = document.getElementById('signup-account').value;
+        const password = document.getElementById('signup-password').value;
+        const name = document.getElementById('signup-name').value;
+        const teamName = document.getElementById('signup-teamName').value;
+
+        try {
+          const response = await fetch(`${baseUrl}/users/signup`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ account, password, name, teamName }), // 회원가입 정보 전송
+          });
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`회원가입 실패: ${errorText}`);
+          }
+
+          const { message } = await response.json();
+          document.getElementById('signup-message').textContent = '회원가입 성공! ' + message;
+        } catch (error) {
+          document.getElementById('signup-message').textContent = `오류: ${error.message}`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

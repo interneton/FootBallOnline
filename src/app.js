@@ -1,5 +1,6 @@
 import express from 'express';
 import swaggerUi from 'swagger-ui-express';
+import cors from 'cors'; // CORS 미들웨어 추가
 import userRouter from './routes/userRouter.js';
 import playerRouter from './routes/playerRouter.js';
 import gameRouter from './routes/gameRouter.js';
@@ -10,13 +11,14 @@ import { logMiddleware } from './middlewares/logMiddleware.js';
 import YAML from 'yamljs';
 
 const app = express();
+
 app.use(express.json());
-app.use(logMiddleware)
+app.use(cors()); // CORS 허용
+app.use(logMiddleware);
 
 const swaggerDocument = YAML.load('./swagger.yaml');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// 라우터 연결
 app.use('/users', userRouter);
 app.use('/players', playerRouter);
 app.use('/game', gameRouter);
@@ -24,6 +26,7 @@ app.use('/shop', shopRouter);
 
 app.use(errorHandler);
 
-app.listen(3000, () => {
-  console.log('서버가 3000포트로 실행되었습니다');
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`서버가 ${PORT} 포트로 실행되었습니다`);
 });
