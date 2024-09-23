@@ -29,11 +29,11 @@ export const getCashAmount = async (req, res, next) => {
 // 선수 뽑기 (가챠 시스템)
 export const drawPlayer = async (req, res, next) => {
   const { userId } = req.user;
-  const { cardId } = req.body;
+  const { packId } = req.body;
 
   try {
     let currentCash = await getCash(userId);
-    let pack = await getPackInfoOne(cardId);
+    let pack = await getPackInfoOne(packId);
 
     if (!pack) {
       throw new CustomError("해당하는 팩이 없습니다.", 404);
@@ -63,7 +63,7 @@ export const drawPlayer = async (req, res, next) => {
     await createUserPlayer(userId, selectedPlayer.soccerPlayerId);
     await purch(userId, currentCash - pack.price);
 
-    res.status(200).json({ message: "선수 뽑기 완료", player });
+    res.status(200).json({ message: "선수 뽑기 완료", selectedPlayer});
   } catch (error) {
     next(error); 
   }

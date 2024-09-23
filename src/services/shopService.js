@@ -84,7 +84,7 @@ export const getPlayersByRank = async(rank) => {
     return await prisma.userPlayer.create({
       data: {
         userId: userId,
-        playerId: playerId,
+        soccerPlayerId: playerId,
       },
     });
   }
