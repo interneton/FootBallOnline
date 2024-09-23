@@ -34,7 +34,6 @@ export const registerPlayerSchema = Joi.object({
 
 // 상점 스키마
 export const purchaseCashSchema = Joi.object({
-  userId: Joi.number().integer().required(),
   amount: Joi.number().integer().min(1).required()
 });
 

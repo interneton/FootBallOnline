@@ -3,7 +3,7 @@ import { CustomError } from '../utils/customError.js';
 
 // 게임 내 캐시 구매
 export const purchaseCash = async (req, res, next) => {
-  const { userId } = req.user;
+  const  userId  = req.user?.userId;
   const { amount } = req.body;
 
   try {
