@@ -2,6 +2,8 @@ import express from 'express';
 import swaggerUi from 'swagger-ui-express';
 import cors from 'cors'; // CORS 미들웨어 추가
 import userRouter from './routes/userRouter.js';
+import tokenRouter from './routes/tokenRouter.js';
+import protectedRouter from './routes/protectedRouter.js';
 import playerRouter from './routes/playerRouter.js';
 import gameRouter from './routes/gameRouter.js';
 import shopRouter from './routes/shopRouter.js';
@@ -25,6 +27,8 @@ app.use('/users', userRouter);
 app.use('/players', playerRouter);
 app.use('/game', gameRouter);
 app.use('/shop', shopRouter);
+app.use('/token', tokenRouter);
+app.use('/protected', protectedRouter);
 
 app.use(errorHandler);
 
