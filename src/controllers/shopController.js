@@ -1,4 +1,4 @@
-import { getPackInfoOne, purch, getCash, makePack, getPlayersByRank } from "../services/shopService.js";
+import { getPackInfoOne, purch, getCash, makePack, getPlayersByRank, createUserPlayer } from "../services/shopService.js";
 import { CustomError } from '../utils/customError.js'; 
 
 // 게임 내 캐시 구매
@@ -46,10 +46,10 @@ export const drawPlayer = async (req, res, next) => {
     let player;
 
     //확률 
-    if (probability < pack.sspb) player = "S";
-    else if (probability < pack.sspb + pack.apb)player = "A";
-    else if (probability < pack.sspb + pack.apb + pack.bpb) player = "B";
-    else if (probability < pack.sspb + pack.apb + pack.bpb + pack.cpb) player = "C";
+    if (probability < pack.SSPB) player = "S";
+    else if (probability < pack.SSPB + pack.APB) player = "A";
+    else if (probability < pack.SSPB + pack.APB + pack.BPB) player = "B";
+    else if (probability < pack.SSPB + pack.APB + pack.BPB + pack.CPB) player = "C";
     else player = "F";
     
     let rankPlay = await getPlayersByRank(player);

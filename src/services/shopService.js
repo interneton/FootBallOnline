@@ -6,11 +6,11 @@ export const getPackInfo = async () => {
     select: {
       name: true,
       price: true,
-      sspb: true,
-      apb: true,
-      bpb: true,
-      cpb: true,
-      fpb: true,
+      SSPB: true,
+      APB: true,
+      BPB: true,
+      CPB: true,
+      FPB: true,
     },
   });
 };
@@ -19,7 +19,7 @@ export const getPackInfo = async () => {
 export const purch = async (userId, amount) => {
   return await prisma.user.update({
     where: { userId },
-    data: { cashAmount: amount },
+    data: { cashAmount: { increment: amount } },
   });
 };
 
@@ -39,25 +39,25 @@ export const getPackInfoOne = async(id)=>{
         select: {
             name: true,
             price: true,
-            sspb: true,
-            apb: true,
-            bpb: true,
-            cpb: true,
-            fpb: true,
+            SSPB: true,
+            APB: true,
+            BPB: true,
+            CPB: true,
+            FPB: true,
         },
     });
 }
 
 //팩 만들기
-export const makePack = async (packname, sspb, apb, bpb, cpb, fpb, price) => {
+export const makePack = async (packname, SSPB, APB, BPB, CPB, FPB, price) => {
   return await prisma.pack.create({
     data: {
       name: packname,
-      sspb: sspb,
-      apb: apb,
-      bpb: bpb,
-      cpb: cpb,
-      fpb: fpb,
+      SSPB: SSPB,
+      APB: APB,
+      BPB: BPB,
+      CPB: CPB,
+      FPB: FPB,
       price: price
       
     },
@@ -69,6 +69,7 @@ export const getPlayersByRank = async(rank) => {
     return await prisma.soccerPlayer.findMany({
       where: { rank },
       select: {
+        soccerPlayerId: true,
         name: true,
         speed: true,
         goalDecision: true,
@@ -76,5 +77,14 @@ export const getPlayersByRank = async(rank) => {
         defense: true,
         stamina: true
       }
+    });
+  }
+
+  export const createUserPlayer = async (userId, playerId) => {
+    return await prisma.userPlayer.create({
+      data: {
+        userId: userId,
+        playerId: playerId,
+      },
     });
   }
