@@ -29,7 +29,7 @@ model MatchManager {
   drawCount   Int      @default(0) @map("draw_count")  // 무승부 카운트
   userId      Int      @map("user_id")
 
-  user        User     @relation(fields: [userId], references: [userId])
+  user        User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
   @@map("match_managers")
 }
 
@@ -39,8 +39,8 @@ model UserPlayer {
   soccerPlayerId Int          @map("soccer_player_id")
   isEquipped    Boolean       @default(false) @map("is_equipped")
 
-  user          User          @relation(fields: [userId], references: [userId])
-  soccerPlayer  SoccerPlayer  @relation(fields: [soccerPlayerId], references: [soccerPlayerId])
+  user          User          @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  soccerPlayer  SoccerPlayer  @relation(fields: [soccerPlayerId], references: [soccerPlayerId], onDelete: Cascade)
 
   @@map("user_players")
 }

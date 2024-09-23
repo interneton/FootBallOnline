@@ -7,13 +7,15 @@ import gameRouter from './routes/gameRouter.js';
 import shopRouter from './routes/shopRouter.js';
 import { errorHandler } from './middlewares/errorMiddleware.js';
 import { logMiddleware } from './middlewares/logMiddleware.js';
+import dotenv from 'dotenv';
 
 import YAML from 'yamljs';
 
+dotenv.config();
 const app = express();
 
 app.use(express.json());
-app.use(cors()); // CORS 허용
+app.use(cors());
 app.use(logMiddleware);
 
 const swaggerDocument = YAML.load('./swagger.yaml');

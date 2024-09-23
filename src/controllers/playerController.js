@@ -3,7 +3,7 @@ import { CustomError } from '../utils/customError.js';
 
 // 선수 장착
 export const equipPlayer = async (req, res, next) => {
-  const { userId } = req.user;
+  const  userId = req.user?.userId;
   const { soccerPlayerId } = req.body;
 
   try {
@@ -27,7 +27,7 @@ export const equipPlayer = async (req, res, next) => {
 
 // 선수 장착 해제
 export const unequipPlayer = async (req, res, next) => {
-  const { userId } = req.user;
+  const  userId = req.user?.userId;
   const { soccerPlayerId } = req.body;
 
   try {

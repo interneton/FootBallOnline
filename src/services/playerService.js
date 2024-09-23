@@ -37,6 +37,7 @@ export const getAllMyPlayer = async(userId)=>{
       select:{
         soccerPlayer: {
           select: {
+            soccerPlayerId: true,
             name: true,
             speed: true,
             goalDecision: true,

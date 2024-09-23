@@ -1,194 +1,568 @@
 openapi: 3.0.0
 info:
-  title: Soccer Game API
-  version: '1.0.0'
-  description: API documentation for the online soccer game
-  contact:
-    name: Support
-    email: support@example.com
+  title: Your API
+  description: API documentation for your application
+  version: 1.0.0
 servers:
-  - url: 'http://localhost:3000'
-    description: Development server
+  - url: http://localhost:3000/ 
+    description: Local server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: User ID
+        account:
+          type: string
+          description: User account email
+        password:
+          type: string
+          description: User password
+        name:
+          type: string
+          description: User's name
+        cashAmount:
+          type: integer
+          description: User's cash amount
+        teamName:
+          type: string
+          description: User's team name
+        score:
+          type: integer
+          description: User's score
+    LoginRequest:
+      type: object
+      properties:
+        account:
+          type: string
+          description: User account email
+        password:
+          type: string
+          description: User password
+      required:
+        - account
+        - password
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+    SignupRequest:
+      type: object
+      properties:
+        account:
+          type: string
+          description: User account email
+        password:
+          type: string
+          description: User password
+        name:
+          type: string
+          description: User's name
+        teamName:
+          type: string
+          description: User's team name
+      required:
+        - account
+        - password
+        - name
+        - teamName
+    SignupResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        newUser:
+          $ref: '#/components/schemas/User'
+    PurchaseCashRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          description: Amount of cash to purchase
+      required:
+        - amount
+    PurchaseCashResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        cash:
+          type: integer
+    DrawPlayerRequest:
+      type: object
+      properties:
+        packId:
+          type: integer
+          description: ID of the player pack
+      required:
+        - packId
+    DrawPlayerResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        player:
+          type: string
+    MakePackRequest:
+      type: object
+      properties:
+        packname:
+          type: string
+          description: Name of the player pack
+        sspb:
+          type: integer
+          description: Probability of getting SSPB player
+        apb:
+          type: integer
+          description: Probability of getting APB player
+        bpb:
+          type: integer
+          description: Probability of getting BPB player
+        cpb:
+          type: integer
+          description: Probability of getting CPB player
+        fpb:
+          type: integer
+          description: Probability of getting FPB player
+        price:
+          type: integer
+          description: Price of the player pack
+      required:
+        - packname
+        - sspb
+        - apb
+        - bpb
+        - cpb
+        - fpb
+        - price
+    MakePackResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        packdata:
+          type: object
+          properties:
+            name:
+              type: string
+            price:
+              type: integer
+            SSPB:
+              type: integer
+            APB:
+              type: integer
+            BPB:
+              type: integer
+            CPB:
+              type: integer
+            FPB:
+              type: integer
+    PlayGameRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          description: ID of the user playing the game
+        result:
+          type: string
+          description: Result of the game
+          enum: [win, loss, draw]
+      required:
+        - userId
+        - result
+    EquipPlayerRequest:
+      type: object
+      properties:
+        soccerPlayerId:
+          type: integer
+          description: Soccer Player ID
+      required:
+        - soccerPlayerId
+    RegisterPlayerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Player's name
+        speed:
+          type: integer
+          description: Speed of the player
+        goalDecision:
+          type: integer
+          description: Goal Decision of the player
+        shootPower:
+          type: integer
+          description: Shoot Power of the player
+        defense:
+          type: integer
+          description: Defense of the player
+        stamina:
+          type: integer
+          description: Stamina of the player
+      required:
+        - name
+        - speed
+        - goalDecision
+        - shootPower
+        - defense
+        - stamina
+
+security:
+  - bearerAuth: []
 
 paths:
+  /token/refresh-token:
+    post:
+      summary: Refresh access token
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  description: Refresh token to generate new access token
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+        '403':
+          description: Refresh token missing or invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /users/login:
+    post:
+      summary: Log in user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Successful login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '500':
+          description: Login failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
   /users/signup:
     post:
-      summary: '회원가입'
-      description: '새로운 사용자 등록'
+      summary: Register a new user
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserSignUp'
+              $ref: '#/components/schemas/SignupRequest'
       responses:
         '201':
-          description: '사용자가 성공적으로 등록되었습니다.'
-        '400':
-          description: '요청 본문이 유효하지 않습니다.'
-  /users/{id}:
-    get:
-      summary: '사용자 정보 조회'
-      description: '주어진 ID를 가진 사용자의 정보를 조회합니다.'
-      parameters:
-        - name: id
-          in: path
-          required: true
-          description: '사용자의 고유 ID'
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: '사용자 정보 반환'
-        '404':
-          description: '사용자를 찾을 수 없음'
-  
-  /players/equip:
-    post:
-      summary: '선수 장착'
-      description: '선수를 장착하여 팀에 추가합니다.'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EquipPlayer'
-      responses:
-        '200':
-          description: '선수 장착 성공'
-        '400':
-          description: '요청 본문이 유효하지 않습니다.'
-
-  /players/unequip:
-    post:
-      summary: '선수 장착 해제'
-      description: '팀에서 선수를 장착 해제합니다.'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EquipPlayer'
-      responses:
-        '200':
-          description: '선수 장착 해제 성공'
-        '400':
-          description: '요청 본문이 유효하지 않습니다.'
-
-  /players/stats:
-    get:
-      summary: '모든 선수 능력치 조회'
-      description: '등록된 모든 선수의 능력치를 조회합니다.'
-      responses:
-        '200':
-          description: '선수 능력치 반환'
-
-  /players/upgrade:
-    post:
-      summary: '선수 강화'
-      description: '선수의 능력치를 강화합니다.'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpgradePlayer'
-      responses:
-        '200':
-          description: '선수 강화 성공'
-        '400':
-          description: '요청 본문이 유효하지 않습니다.'
-
-  /players/register:
-    post:
-      summary: '선수 등록'
-      description: '새로운 선수를 등록합니다.'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterPlayer'
-      responses:
-        '201':
-          description: '선수가 성공적으로 등록되었습니다.'
-        '400':
-          description: '요청 본문이 유효하지 않습니다.'
+          description: Signup successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResponse'
+        '500':
+          description: Signup failed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
   /shop/purchase:
     post:
-      summary: '캐시 구매'
-      description: '게임 내 캐시를 구매합니다.'
+      summary: Purchase cash
+      security:
+        - bearerAuth: [] # Ensure the security is defined
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PurchaseCash'
+              $ref: '#/components/schemas/PurchaseCashRequest'
       responses:
         '200':
-          description: '캐시 구매 성공'
+          description: Cash purchased successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseCashResponse'
         '400':
-          description: '요청 본문이 유효하지 않습니다.'
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
-  /shop/getCashAmount/{userId}:
+  /shop/getCashAmount:
     get:
-      summary: '캐시 잔액 조회'
-      description: '사용자의 현재 캐시 잔액을 조회합니다.'
-      parameters:
-        - name: userId
-          in: path
-          required: true
-          description: '사용자의 고유 ID'
-          schema:
-            type: integer
+      summary: Get current cash amount
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: '캐시 잔액 반환'
-        '404':
-          description: '사용자를 찾을 수 없음'
+          description: Current cash amount retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cashAmount:
+                    type: integer
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
   /shop/draw:
     post:
-      summary: '선수 뽑기'
-      description: '가챠 시스템을 통해 선수를 뽑습니다.'
+      summary: Draw a player
+      security:
+        - bearerAuth: []
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DrawPlayer'
+              $ref: '#/components/schemas/DrawPlayerRequest'
       responses:
         '200':
-          description: '선수 뽑기 성공'
+          description: Player drawn successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DrawPlayerResponse'
         '400':
-          description: '요청 본문이 유효하지 않습니다.'
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /shop/makepack:
+    post:
+      summary: Create a new player pack
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MakePackRequest'
+      responses:
+        '201':
+          description: Pack created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MakePackResponse'
+        '400':
+          description: Invalid probability
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /players/equip:
+    post:
+      summary: Equip a player
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipPlayerRequest'
+      responses:
+        '200':
+          description: Player equipped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /players/unequip:
+    post:
+      summary: Unequip a player
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipPlayerRequest'
+      responses:
+        '200':
+          description: Player unequipped successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Player not equipped
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /players/stats:
+    get:
+      summary: Get all player stats
+      responses:
+        '200':
+          description: Player stats retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    speed:
+                      type: integer
+                    goalDecision:
+                      type: integer
+                    shootPower:
+                      type: integer
+                    defense:
+                      type: integer
+                    stamina:
+                      type: integer
+
+  /players/register:
+    post:
+      summary: Register a new player
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterPlayerRequest'
+      responses:
+        '201':
+          description: Player registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  player:
+                    $ref: '#/components/schemas/Player'
+        '409':
+          description: Duplicate player
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
   /game/play:
     post:
-      summary: '게임 플레이'
-      description: '게임을 플레이하고 결과를 기록합니다.'
+      summary: Record match result
+      security:
+        - bearerAuth: []
       requestBody:
-        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PlayGame'
+              $ref: '#/components/schemas/PlayGameRequest'
       responses:
         '200':
-          description: '게임 플레이 성공'
+          description: Match result recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayGameResponse'
         '400':
-          description: '요청 본문이 유효하지 않습니다.'
-        '401':
-          description: '인증 실패'
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
   /game/ranking:
     get:
-      summary: '유저 랭킹 조회'
-      description: '게임 내 유저 랭킹을 조회합니다.'
+      summary: Get user rankings
       responses:
         '200':
-          description: '유저 랭킹 리스트 반환'
+          description: Rankings retrieved successfully
           content:
             application/json:
               schema:
@@ -198,121 +572,14 @@ paths:
                   properties:
                     userId:
                       type: integer
-                      example: 1
-                    username:
-                      type: string
-                      example: 'user123'
-                    points:
+                    score:
                       type: integer
-                      example: 1500
-        '401':
-          description: '인증 실패'
-
-components:
-  schemas:
-    UserSignUp:
-      type: object
-      properties:
-        account:
-          type: string
-          example: 'user@example.com'
-        password:
-          type: string
-          example: 'password123'
-        name:
-          type: string
-          example: 'John Doe'
-        teamName:
-          type: string
-          example: 'Dream Team'
-      required:
-        - account
-        - password
-        - name
-        - teamName
-
-    EquipPlayer:
-      type: object
-      properties:
-        userId:
-          type: integer
-          example: 1
-        soccerPlayerId:
-          type: integer
-          example: 100
-      required:
-        - userId
-        - soccerPlayerId
-
-    PurchaseCash:
-      type: object
-      properties:
-        amount:
-          type: number
-          example: 1000
-      required:
-        - amount
-
-    DrawPlayer:
-      type: object
-      properties:
-        userId:
-          type: integer
-          example: 1
-      required:
-        - userId
-
-    UpgradePlayer:
-      type: object
-      properties:
-        userId:
-          type: integer
-          example: 1
-        playerId:
-          type: integer
-          example: 101
-        level:
-          type: integer
-          example: 2
-      required:
-        - userId
-        - playerId
-        - level
-
-    PlayGame:
-      type: object
-      properties:
-        userId:
-          type: integer
-          example: 1
-      required:
-        - userId
-
-    RegisterPlayer:
-      type: object
-      properties:
-        name:
-          type: string
-          example: 'Lionel Messi'
-        speed:
-          type: integer
-          example: 85
-        goalDecision:
-          type: integer
-          example: 92
-        shootPower:
-          type: integer
-          example: 88
-        defense:
-          type: integer
-          example: 45
-        stamina:
-          type: integer
-          example: 80
-      required:
-        - name
-        - speed
-        - goalDecision
-        - shootPower
-        - defense
-        - stamina
+        '404':
+          description: No ranking data found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
