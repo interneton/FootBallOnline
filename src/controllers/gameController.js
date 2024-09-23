@@ -36,7 +36,6 @@ export const playGame = async (req, res, next) => {
 
     // 경기 결과 기록
     const userResult = userScore > opponentScore ? 'win' : userScore < opponentScore ? 'loss' : 'draw';
-    const opponentResult = userScore > opponentScore ? 'loss' : userScore < opponentScore ? 'win' : 'draw';
 
     const result = {
       user: username,

@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   userId      Int          @id @default(autoincrement()) @map("user_id")
-  account     String       @map("account")
+  account     String       @unique @map("account")
   password    String       @map("password")
   name        String       @map("name")
   cashAmount  Int          @default(1000) @map("cash_amount") // 기본 캐시 설정
