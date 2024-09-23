@@ -8,7 +8,7 @@ export const equipPlayer = async (req, res, next) => {
 
   try {
     const equippedPlayer = await playerService.equipList(userId);
-    const isequip = equip.some(player=>player.soccerPlayer.soccerPlayerId===soccerPlayerId);
+    const isequip = equippedPlayer.some(player=>player.soccerPlayer.soccerPlayerId===soccerPlayerId);
     
     if (equippedPlayer.length >= 3) {
       throw new CustomError("장착할 수 있는 선수는 최대 3명입니다.", 400);
@@ -31,9 +31,9 @@ export const unequipPlayer = async (req, res, next) => {
   const { soccerPlayerId } = req.body;
 
   try {
-    const equippedPlayer = await playerService.equipList(userId);  
+    const equippedPlayer = await playerService.equipList(userId);
     const isequip = equippedPlayer.some(player => player.soccerPlayer.soccerPlayerId === soccerPlayerId);
-  
+    
     if (!isequip) {
       throw new CustomError("장착된 선수가 아닙니다.", 404);
     }

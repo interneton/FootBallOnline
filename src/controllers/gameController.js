@@ -20,11 +20,17 @@ export const playGame = async (req, res, next) => {
     let opponentPlayers = await equipList(opponentUser.userId);
 
 
-    while (opponentPlayers.length < 3) {
+    let attempts = 0;
+    const maxAttempts = 50;
+    while (opponentPlayers.length < 3 && attempts < maxAttempts) {
       randomIndex = Math.floor(Math.random() * Players.length);
-      opponentUser = Players[randomIndex]
-      opponentname = await getUsername(opponentUser.userId)
-      opponentPlayers = await equipList(opponentUser.userId)
+      opponentUser = Players[randomIndex];
+      opponentname = await getUsername(opponentUser.userId);
+      opponentPlayers = await equipList(opponentUser.userId);
+      attempts++;
+    }
+    if (opponentPlayers.length < 3) {
+      throw new CustomError("충분한 유저를 찾지 못했습니다.", 400);
     }
 
     const userScore = userPlayers.reduce((sum, player) => {

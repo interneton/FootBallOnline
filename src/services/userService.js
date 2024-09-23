@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 // Access Token 생성
 export const createAccessToken = (userId) => {
-  return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' });
+  return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '2h' });
 };
 
 // Refresh Token 생성
