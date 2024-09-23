@@ -1,5 +1,6 @@
 import { getRandomUser, equipList  } from '../services/playerService.js';
 import { recordMatchResult ,getUsername} from '../services/gameService.js';
+import { CustomError } from '../utils/customError.js';
 
 export const playGame = async (req, res, next) => {
   try {
@@ -8,8 +9,8 @@ export const playGame = async (req, res, next) => {
     
     // 유저와 상대방의 장착된 선수들의 스탯 합산
     const userPlayers = await equipList(userId);
-    if(userPlayers.length < 3 ){
-      throw new Error("유저의 구단은 최소 3명에 충족하지 않습니다.")
+    if (userPlayers.length < 3) {
+      throw new CustomError("유저의 구단은 최소 3명의 선수로 구성되어야 합니다.", 400);
     }
 
     const Players = await getRandomUser(userId);
@@ -64,7 +65,7 @@ export const getRanking = async (req, res, next) => {
     });
 
     if (rankings.length === 0) {
-      return res.status(200).json({ message: "랭킹이 없습니다." });
+      throw new CustomError("랭킹 데이터가 없습니다.", 404);
     }
 
     const sortedRankings = rankings

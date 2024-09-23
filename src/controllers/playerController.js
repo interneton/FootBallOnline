@@ -1,4 +1,5 @@
 import * as playerService from "../services/playerService.js";
+import { CustomError } from '../utils/customError.js'; 
 
 // 선수 장착
 export const equipPlayer = async (req, res, next) => {
@@ -9,8 +10,13 @@ export const equipPlayer = async (req, res, next) => {
     const equippedPlayer = await playerService.equipList(userId);
     const isequip = equip.some(player=>player.soccerPlayer.soccerPlayerId===soccerPlayerId);
     
-    if (equippedPlayer.length >= 3) throw new Error("장착할 수 있는 선수는 최대 3명입니다.");
-    if (isequip) throw new Error("캐릭터가 이미 장착되어있습니다.")
+    if (equippedPlayer.length >= 3) {
+      throw new CustomError("장착할 수 있는 선수는 최대 3명입니다.", 400);
+    }
+
+    if (isequip) {
+      throw new CustomError("선수가 이미 장착되어 있습니다.", 409);
+    }
 
     const result = await playerService.equipPlayer(userId, soccerPlayerId);
     res.status(200).json({message: "선수 장착 완료"});
@@ -28,7 +34,9 @@ export const unequipPlayer = async (req, res, next) => {
     const equippedPlayer = await playerService.equipList(userId);  
     const isequip = equippedPlayer.some(player => player.soccerPlayer.soccerPlayerId === soccerPlayerId);
   
-    if (!isequip) throw new Error("장착된 선수가 아닙니다.");
+    if (!isequip) {
+      throw new CustomError("장착된 선수가 아닙니다.", 404);
+    }
 
     await playerService.unequipPlayer(userId, soccerPlayerId);
     res.status(200).json({message: "선수 장착 해제 완료"});
@@ -53,8 +61,8 @@ export const createPlayer = async (req, res, next) => {
 
   try {
     const existingPlayer = await playerService.getPlayerByName(name);
-    if (existingPlayer&&existingPlayer.rank === rank) {
-      throw new Error("이름이 같은 선수가 이미 존재합니다.");
+    if (existingPlayer && existingPlayer.rank === rank) {
+      throw new CustomError("이름과 랭크가 동일한 선수가 이미 존재합니다.", 409);
     }
     const newPlayer = await 
     playerService.createPlayer({

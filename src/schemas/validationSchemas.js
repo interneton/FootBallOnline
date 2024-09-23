@@ -42,6 +42,17 @@ export const drawPlayerSchema = Joi.object({
   packId: Joi.number().integer().required()
 });
 
+export const createPackSchema = Joi.object({
+  packname: Joi.string().required(),
+  sspb: Joi.number().integer().min(0).max(100).required(),
+  apb: Joi.number().integer().min(0).max(100).required(),
+  bpb: Joi.number().integer().min(0).max(100).required(),
+  cpb: Joi.number().integer().min(0).max(100).required(),
+  fpb: Joi.number().integer().min(0).max(100).required(),
+  price: Joi.number().integer().min(0).required()
+});
+
+
 // 사용자 스키마
 export const signUpSchema = Joi.object({
   account: Joi.string().email().required(),

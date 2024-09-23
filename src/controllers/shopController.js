@@ -1,4 +1,5 @@
-import { getPackInfoOne,purch,getCash,makePack,getPlayersByRank } from "../services/shopService.js";
+import { getPackInfoOne, purch, getCash, makePack, getPlayersByRank } from "../services/shopService.js";
+import { CustomError } from '../utils/customError.js'; 
 
 // 게임 내 캐시 구매
 export const purchaseCash = async (req, res, next) => {
@@ -34,8 +35,12 @@ export const drawPlayer = async (req, res, next) => {
     let currentCash = await getCash(userId);
     let pack = await getPackInfoOne(cardId);
 
-    if(!pack) throw new Error("해당하는 팩은 없습니다.");
-    if(currentCash - pack.price < 0) throw new Error("캐쉬가 모자릅니다.");
+    if (!pack) {
+      throw new CustomError("해당하는 팩이 없습니다.", 404);
+    }
+    if (currentCash - pack.price < 0) {
+      throw new CustomError("캐쉬가 부족합니다.", 400);
+    }
 
     let probability = Math.floor(Math.random() * 100);
     let player;
@@ -48,7 +53,9 @@ export const drawPlayer = async (req, res, next) => {
     else player = "F";
     
     let rankPlay = await getPlayersByRank(player);
-    if (rankPlay.length === 0) throw new Error("해당 랭크의 선수가 없습니다.");
+    if (rankPlay.length === 0) {
+      throw new CustomError("해당 랭크의 선수가 없습니다.", 404);
+    }
 
     const randomIndex = Math.floor(Math.random() * rankPlay.length);
     const selectedPlayer = rankPlay[randomIndex];
@@ -64,20 +71,17 @@ export const drawPlayer = async (req, res, next) => {
 
 
 //팩 만들기
-export const makePackcontroller = async (req,res,next)=>{
+export const makePackcontroller = async (req, res, next) => {
   const { packname, sspb, apb, bpb, cpb, fpb, price } = req.body;
   try {
-    if (isNaN(sspb) || isNaN(apb) || isNaN(bpb) || isNaN(cpb) || isNaN(fpb) || isNaN(price)) throw new Error("확률에 정확한 숫자를 적으십시오.");
-    
-    const allprobability = sspb+apb+bpb+cpb+fpb;
 
-    if(Number(allprobability)!==100)throw new Error("확률이 맞지 않습니다.");
+    const allprobability = sspb + apb + bpb + cpb + fpb;
+    if (allprobability !== 100) throw new Error("확률이 맞지 않습니다.");
 
-    const packdata = makePack(packname,sspb,apb,bpb,cpb,fpb,price);
+    const packdata = await makePack(packname, sspb, apb, bpb, cpb, fpb, price);
 
-    return res.status(201).json({message:"팩 생성 완료",packdata})
+    return res.status(201).json({ message: "팩 생성 완료", packdata });
+  } catch (error) {
+    next(error);
   }
-  catch(error){
-    next(error)
-  }
-}
+};
