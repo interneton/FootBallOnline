@@ -14,6 +14,7 @@ model User {
   name        String       @map("name")
   cashAmount  Int          @default(1000) @map("cash_amount") // 기본 캐시 설정
   teamName    String       @map("team_name")
+  score       Int          @default(1000) @map("score")
 
   userPlayers UserPlayer[] 
   matchManager MatchManager[] // MatchManager와의 관계 추가

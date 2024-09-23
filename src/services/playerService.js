@@ -96,16 +96,34 @@ export const createUserPlayer = async (userId, soccerPlayerId) => {
   });
 }
 
-export const getRandomPlayer = async (userId) => {
-  const players = await prisma.soccerPlayer.findMany({
+export const getRandomUser = async (userId) => {
+  const userScore = (await prisma.user.findFirst({ where: { userId } })).score;
+  let players = await prisma.user.findMany({
     where: {
       NOT: {
         userId: userId
+      },
+      score: {
+        gte: userScore - 100,
+        lte: userScore + 100
       }
     }
   });
-  const randomIndex = Math.floor(Math.random() * players.length);
-  return players[randomIndex];
+
+  for (let i = 0; i < players.length; i++) {
+    const playerCount = await prisma.userPlayer.count({
+      where: {
+        userId: players[i].userId,
+        isEquipped: true
+      }
+    });
+    if (playerCount < 3) {
+      players[i] = null;
+    }
+  }
+
+  players = players.filter(player => player !== null);
+  return players;
 };
 
 export const createPlayer = async (playerData) => {
