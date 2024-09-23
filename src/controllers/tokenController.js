@@ -7,7 +7,7 @@ export const refreshAccessToken = async (req, res, next) => {
   
     try {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-      const accessToken = createAccessToken(decoded.id);
+      const accessToken = createAccessToken(decoded.userId);
       res.status(200).json({ accessToken });
     } catch (error) {
       if (error.name === 'TokenExpiredError') {

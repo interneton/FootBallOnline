@@ -32,7 +32,7 @@ export const signupService = async (account, password, name, teamName) => {
 
 // 로그인 서비스
 export const loginService = async (account, password) => {
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findOne({
     where: { account },
   });
 
