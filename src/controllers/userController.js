@@ -2,8 +2,8 @@ import { signupService, loginService, createAccessToken, createRefreshToken } fr
 
 export const signup = async (req, res) => {
   try {
-    const { account, password, name } = req.body;
-    const newUser = await signupService(account, password, name);
+    const { account, password, name, teamName } = req.body;
+    const newUser = await signupService(account, password, name, teamName);
     res.status(201).json({ message: '회원가입 성공', newUser });
   } catch (error) {
     res.status(500).json({ message: '회원가입 실패', error });

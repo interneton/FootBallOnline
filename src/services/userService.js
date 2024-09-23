@@ -14,7 +14,7 @@ export const createRefreshToken = (userId) => {
 };
 
 // 회원가입 서비스
-export const signupService = async (account, password, name) => {
+export const signupService = async (account, password, name, teamName) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = await prisma.user.create({
@@ -22,6 +22,7 @@ export const signupService = async (account, password, name) => {
       account,
       password: hashedPassword,
       name,
+      teamName,
       cashAmount: 1000, // 기본 캐시 설정
     },
   });
