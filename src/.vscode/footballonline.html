@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Football Online</h1>
+        <div id=logoutBtnBox>
+            <button id="logout-btn" style="display: none;">로그아웃</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 로그인 섹션 -->
+        <section id="auth-section">
+            <h2>로그인</h2>
+            <div id="login-form">
+                <h3>로그인</h3>
+                <form id="loginForm">
+                    <label for="login-account">이메일:</label>
+                    <input type="email" id="login-account" name="account" required>
+                    <label for="login-password">비밀번호:</label>
+                    <input type="password" id="login-password" name="password" required>
+                    <button type="submit" class="btn">로그인</button>
+                </form>
+                <p id="login-message"></p>
+            </div>
+        </section>
+
+        <!-- 회원가입 섹션 -->
+        <section id="signup-section">
+            <h2>회원가입</h2>
+            <div id="signup-form">
+                <h3>회원가입</h3>
+                <form id="signupForm">
+                    <label for="signup-account">이메일:</label>
+                    <input type="email" id="signup-account" name="account" required>
+                    <label for="signup-password">비밀번호:</label>
+                    <input type="password" id="signup-password" name="password" required>
+                    <br><label for="signup-name">이름:</label>
+                    <input type="text" id="signup-name" name="name" required>
+                    <label for="signup-teamName">팀 이름:</label>
+                    <input type="text" id="signup-teamName" name="teamName" required>
+                    <button type="submit" class="btn">회원가입</button>
+                </form>
+                <p id="signup-message"></p>
+            </div>
+        </section>
+
+        <!-- 게임 섹션 -->
+        <section id="game-section" style="display: none;">
+            <h2>경기 시작</h2>
+            <button id="start-game-btn" class="btn">경기 시작하기</button>
+            <div id="game-result">
+                <h3>경기 결과</h3>
+                <p id="game-result-text">결과가 여기에 표시됩니다.</p>
+            </div>
+        </section>
+
+        <!-- 선수 관리 섹션 -->
+        <section id="player-section" style="display: none;">
+            <h2>선수 관리</h2>
+            <div id="equipped-players">
+                <h3>장착된 선수 목록</h3>
+                <ul id="equipped-players-list"></ul>
+                <button id="unequip-player-btn" class="btn">선수 장착 해제</button>
+            </div>
+            <div id="all-players">
+                <h3>모든 선수 목록</h3>
+                <ul id="all-players-list"></ul>
+            </div>
+        </section>
+
+        <!-- 상점 섹션 -->
+        <section id="shop-section" style="display: none;">
+            <h2>가챠상점</h2>
+            <button id="draw-player-1-btn" class="btn">1회 뽑기 (100캐쉬)</button>
+            <button id="draw-player-5-btn" class="btn">5회 뽑기 (500캐쉬)</button>
+            <button id="draw-player-10-btn" class="btn">10회 뽑기 (1000캐쉬)</button>
+            <p id="draw-result">선수 뽑기 결과가 여기에 표시됩니다.</p>
+            <p id="cash-amount">보유 캐시: </p>
+        </section>
+        <!-- 캐쉬 구매 섹션 -->
+        <section id="cashShop-section" style="display: none;">
+            <h2>캐쉬상점</h2>
+            <button id="buy-cash-100-btn" class="btn">100캐쉬 구매하기</button>
+            <button id="buy-cash-500-btn" class="btn">500캐쉬 구매하기</button>
+            <button id="buy-cash-1000-btn" class="btn">1000캐쉬 구매하기</button>
+            <p id="cash-amount">보유 캐시: </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Football Online</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const baseUrl = 'http://localhost:3000'; // 백엔드 API 주소
+
+            // 캐쉬 구매 처리
+            document.getElementById('buy-cash-100-btn').addEventListener('click', () => purchaseCash(100));
+            document.getElementById('buy-cash-500-btn').addEventListener('click', () => purchaseCash(500));
+            document.getElementById('buy-cash-1000-btn').addEventListener('click', () => purchaseCash(1000));
+            async function purchaseCash(amount) {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                try {
+                    const response = await fetch(`${baseUrl}/shop/purchase`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ amount })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`캐쉬 구매 실패: ${errorText}`);
+                    }
+
+                    const { cashAmount } = await response.json();
+                    document.getElementById('cash-amount').textContent = `보유 캐시: ${cashAmount}`;
+                    alert(`${amount} 캐쉬를 성공적으로 구매했습니다.`);
+                } catch (error) {
+                    alert(`오류: ${error.message}`);
+                }
+            }
+            // 선수 뽑기 처리
+            document.getElementById('draw-player-1-btn').addEventListener('click', () => drawPlayer(1));
+            document.getElementById('draw-player-5-btn').addEventListener('click', () => drawPlayer(5));
+            document.getElementById('draw-player-10-btn').addEventListener('click', () => drawPlayer(10));
+
+            async function drawPlayer(count) {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                try {
+                    const response = await fetch(`${baseUrl}/shop/draw`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ count }) // 뽑기 수 전달
+                    });
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`선수 뽑기 실패: ${errorText}`);
+                    }
+
+                    const { players, cashAmount } = await response.json();
+                    document.getElementById('draw-result').textContent = `뽑힌 선수들: ${players.join(', ')}`;
+                    document.getElementById('cash-amount').textContent = `보유 캐시: ${cashAmount}`;
+                } catch (error) {
+                    alert(`오류: ${error.message}`);
+                }
+            }
+
+            // 로그인 처리
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const account = document.getElementById('login-account').value;
+                const password = document.getElementById('login-password').value;
+
+                try {
+                    const response = await fetch(`${baseUrl}/users/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ account, password }),
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`로그인 실패: ${errorText}`);
+                    }
+
+                    const { accessToken } = await response.json();
+                    localStorage.setItem('accessToken', accessToken);
+                    document.getElementById('login-message').textContent = '로그인 성공!';
+                    showGameSections();
+                    document.getElementById('signup-section').style.display = 'none';
+                    document.getElementById('cashShop-section').style.display = 'block';
+                } catch (error) {
+                    document.getElementById('login-message').textContent = `오류: ${error.message}`;
+                }
+            });
+
+            // 회원가입 처리
+            document.getElementById('signupForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const account = document.getElementById('signup-account').value;
+                const password = document.getElementById('signup-password').value;
+                const name = document.getElementById('signup-name').value;
+                const teamName = document.getElementById('signup-teamName').value;
+
+                try {
+                    const response = await fetch(`${baseUrl}/users/signup`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ account, password, name, teamName }),
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`회원가입 실패: ${errorText}`);
+                    }
+
+                    const { message } = await response.json();
+                    document.getElementById('signup-message').textContent = '회원가입 성공! ' + message;
+                } catch (error) {
+                    document.getElementById('signup-message').textContent = `오류: ${error.message}`;
+                }
+            });
+
+            // 로그아웃 처리
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('accessToken');
+                document.getElementById('logout-btn').style.display = 'none';
+                document.getElementById('game-section').style.display = 'none';
+                document.getElementById('player-section').style.display = 'none';
+                document.getElementById('shop-section').style.display = 'none';
+                document.getElementById('auth-section').style.display = 'block';
+                document.getElementById('login-message').textContent = '';
+                document.getElementById('signup-section').style.display = 'block';
+            });
+
+            // 게임 섹션 표시
+            function showGameSections() {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('game-section').style.display = 'block';
+                document.getElementById('player-section').style.display = 'block';
+                document.getElementById('shop-section').style.display = 'block';
+                document.getElementById('logout-btn').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>
