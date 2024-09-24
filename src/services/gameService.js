@@ -1,121 +1,108 @@
 import { prisma } from "../utils/prisma/client.js";
 
 export const recordMatchResult = async (userId, opponentId, result, username, opponentname) => {
-    try {
-        let matchManager = await prisma.matchManager.findFirst({
-            where: { userId: userId },
-        });
+  try {
+    const [matchManager, opponentMatchManager] = await Promise.all([
+      prisma.matchManager.findFirst({ where: { userId: userId } }),
+      prisma.matchManager.findFirst({ where: { userId: opponentId } }),
+    ]);
 
-        if (!matchManager) {
-            matchManager = await prisma.matchManager.create({
-                data: {
-                    userId: userId,
-                    winCount: 0,
-                    lossCount: 0,
-                    drawCount: 0,
-                },
-            });
-        }
+    const userMatchManager =
+      matchManager ||
+      (await prisma.matchManager.create({
+        data: {
+          userId: userId,
+          winCount: 0,
+          lossCount: 0,
+          drawCount: 0,
+        },
+      }));
 
-        let opponentMatchManager = await prisma.matchManager.findFirst({
-            where: { userId: opponentId },
-        });
+    const opponentManager =
+      opponentMatchManager ||
+      (await prisma.matchManager.create({
+        data: {
+          userId: opponentId,
+          winCount: 0,
+          lossCount: 0,
+          drawCount: 0,
+        },
+      }));
 
-        if (!opponentMatchManager) {
-            opponentMatchManager = await prisma.matchManager.create({
-                data: {
-                    userId: opponentId,
-                    winCount: 0,
-                    lossCount: 0,
-                    drawCount: 0,
-                },
-            });
-        }
+    let updateData = {};
+    let opponentUpdateData = {};
+    let scoreChange = 0;
+    let opponentresult = "";
 
-        let updateData = {};
-        let opponentUpdateData = {};
-        let scoreChange = 0;
-        let opponentresult = '';
-
-        if (result === 'win') 
-        {
-            updateData = { winCount: matchManager.winCount + 1 };
-            opponentUpdateData = { lossCount: opponentMatchManager.lossCount + 1 };
-            scoreChange = 10;
-            opponentresult = 'loss'
-        } 
-        else if (result === 'loss') 
-        {
-            updateData = { lossCount: matchManager.lossCount + 1 };
-            opponentUpdateData = { winCount: opponentMatchManager.winCount + 1 };
-            scoreChange = -10;
-            opponentresult = 'win'
-        } 
-        else if (result === 'draw') 
-        {
-            updateData = { drawCount: matchManager.drawCount + 1 };
-            opponentUpdateData = { drawCount: opponentMatchManager.drawCount + 1 };
-            opponentresult = 'draw'
-        } 
-        else 
-        {
-            throw new Error("잘못된 결과 값입니다.");
-        }
-
-        await prisma.matchManager.update({
-            where: { id: matchManager.id }, // userId 대신 id 사용
-            data: updateData,
-        });
-
-        await prisma.matchManager.update({
-            where: { id: opponentMatchManager.id }, // userId 대신 id 사용
-            data: opponentUpdateData,
-        });
-
-        await prisma.user.update({
-            where: { userId: userId },
-            data: { score: { increment: scoreChange } },
-        });
-
-        await prisma.user.update({
-            where: { userId: opponentId },
-            data: { score: { increment: -scoreChange } },
-        });
-
-        await prisma.fightRecord.create({
-            data: {
-                username: username,
-                opponentname: opponentname,
-                result: result,
-            },
-        });
-
-        await prisma.fightRecord.create({
-            data: {
-                username: opponentname,
-                opponentname: username,
-                result: opponentresult,
-            },
-        });
-        
-        
-        
-    } catch (error) {
-        console.error("경기 결과 기록 중 오류 발생:", error);
-        throw error;
+    switch (result) {
+      case "win":
+        updateData = { winCount: userMatchManager.winCount + 1 };
+        opponentUpdateData = { lossCount: opponentManager.lossCount + 1 };
+        scoreChange = 10;
+        opponentresult = "loss";
+        break;
+      case "loss":
+        updateData = { lossCount: userMatchManager.lossCount + 1 };
+        opponentUpdateData = { winCount: opponentManager.winCount + 1 };
+        scoreChange = -10;
+        opponentresult = "win";
+        break;
+      case "draw":
+        updateData = { drawCount: userMatchManager.drawCount + 1 };
+        opponentUpdateData = { drawCount: opponentManager.drawCount + 1 };
+        opponentresult = "draw";
+        break;
+      default:
+        throw new Error("잘못된 결과 값입니다.");
     }
+
+    await prisma.$transaction(async (tx) => {
+      tx.matchManager.update({
+        where: { id: userMatchManager.id },
+        data: updateData,
+      }),
+      tx.matchManager.update({
+        where: { id: opponentManager.id },
+        data: opponentUpdateData,
+      }),
+      tx.user.update({
+        where: { userId: userId },
+        data: { score: { increment: scoreChange } },
+      }),
+      tx.user.update({
+        where: { userId: opponentId },
+        data: { score: { increment: -scoreChange } },
+      }),
+      tx.fightRecord.create({
+        data: {
+          username: username,
+          opponentname: opponentname,
+          result: result,
+        },
+      }),
+      tx.fightRecord.create({
+        data: {
+          username: opponentname,
+          opponentname: username,
+          result: opponentresult,
+        },
+      });
+    });
+  } catch (error) {
+    console.error("경기 결과 기록 중 오류 발생:", error);
+    throw error;
+  }
 };
 
-
 export const getUsername = async (userId) => {
-    try {
-        const user = await prisma.user.findFirst({
-            where: { userId: userId },
-            select: { name: true },
-        });
-        return user?.name || null;
-    } catch (error) {
-        console.error("userId로 사용자 닉네임 조회 중 오류 발생:", error);
-        throw error;
-    }
+  try {
+    const user = await prisma.user.findFirst({
+      where: { userId: userId },
+      select: { name: true },
+    });
+    return user?.name || null;
+  } catch (error) {
+    console.error("userId로 사용자 닉네임 조회 중 오류 발생:", error);
+    throw error;
+  }
 };

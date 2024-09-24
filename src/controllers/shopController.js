@@ -3,7 +3,7 @@ import { CustomError } from '../utils/customError.js';
 
 // 게임 내 캐시 구매
 export const purchaseCash = async (req, res, next) => {
-  const  userId  = req.user?.userId;
+  const userId = req.user.userId;
   const { amount } = req.body;
 
   try {
@@ -45,7 +45,7 @@ export const drawPlayer = async (req, res, next) => {
     let probability = Math.floor(Math.random() * 100);
     let player;
 
-    //확률 
+    // 확률 
     if (probability < pack.SSPB) player = "S";
     else if (probability < pack.SSPB + pack.APB) player = "A";
     else if (probability < pack.SSPB + pack.APB + pack.BPB) player = "B";
@@ -63,18 +63,16 @@ export const drawPlayer = async (req, res, next) => {
     await createUserPlayer(userId, selectedPlayer.soccerPlayerId);
     await purch(userId, currentCash - pack.price);
 
-    res.status(200).json({ message: "선수 뽑기 완료", selectedPlayer});
+    res.status(200).json({ message: "선수 뽑기 완료", selectedPlayer });
   } catch (error) {
     next(error); 
   }
 };
 
-
-//팩 만들기
+// 팩 만들기
 export const makePackcontroller = async (req, res, next) => {
   const { packname, sspb, apb, bpb, cpb, fpb, price } = req.body;
   try {
-
     const allprobability = sspb + apb + bpb + cpb + fpb;
     if (allprobability !== 100) throw new Error("확률이 맞지 않습니다.");
 
