@@ -20,7 +20,7 @@ export const getPackInfo = async () => {
 export const purch = async (userId, amount) => {
   return await prisma.user.update({
     where: { userId },
-    data: { cashAmount: { increment: amount } },
+    data: { cashAmount: amount },
   });
 };
 
