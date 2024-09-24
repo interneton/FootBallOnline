@@ -351,8 +351,18 @@
 
                     data.players.forEach(player => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${player.soccerPlayer.name} - 스피드: ${player.soccerPlayer.speed}, 슛 파워: ${player.soccerPlayer.shootPower}`;
-                        
+                        listItem.style.border = '1px solid #ddd';
+                        listItem.style.padding = '10px';
+                        listItem.style.marginBottom = '10px';
+                        listItem.style.borderRadius = '5px';
+                        listItem.style.display = 'flex';
+                        listItem.style.justifyContent = 'space-between';
+                        listItem.style.alignItems = 'center';
+
+                        const playerInfo = document.createElement('span');
+                        playerInfo.textContent = `${player.soccerPlayer.name} - 스피드: ${player.soccerPlayer.speed}, 슛 파워: ${player.soccerPlayer.shootPower}`;
+                        listItem.appendChild(playerInfo);
+
                         if (player.isEquipped) {    
                             const unequipButton = document.createElement('button');
                             unequipButton.textContent = '해제';
@@ -468,6 +478,11 @@
                     data.forEach((player, index) => {
                         const listItem = document.createElement('li');
                         listItem.textContent = `${index + 1}. ${player.name} - ${player.score} 점`;
+                        listItem.style.border = '1px solid #ddd';
+                        listItem.style.padding = '10px';
+                        listItem.style.margin = '5px 0';
+                        listItem.style.borderRadius = '5px';
+                        listItem.style.backgroundColor = '#f9f9f9';
                         rankingList.appendChild(listItem);
                     });
                 } catch (error) {
