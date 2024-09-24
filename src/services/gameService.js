@@ -32,6 +32,7 @@ export const recordMatchResult = async (userId, opponentId, result, username, op
     let updateData = {};
     let opponentUpdateData = {};
     let scoreChange = 0;
+    let opponentScoreChange = 0;
     let opponentresult = "";
 
     switch (result) {
@@ -39,12 +40,14 @@ export const recordMatchResult = async (userId, opponentId, result, username, op
         updateData = { winCount: userMatchManager.winCount + 1 };
         opponentUpdateData = { lossCount: opponentManager.lossCount + 1 };
         scoreChange = 10;
+        opponentScoreChange = -10;
         opponentresult = "loss";
         break;
       case "loss":
         updateData = { lossCount: userMatchManager.lossCount + 1 };
         opponentUpdateData = { winCount: opponentManager.winCount + 1 };
         scoreChange = -10;
+        opponentScoreChange = 10;
         opponentresult = "win";
         break;
       case "draw":
@@ -57,30 +60,30 @@ export const recordMatchResult = async (userId, opponentId, result, username, op
     }
 
     await prisma.$transaction(async (tx) => {
-      tx.matchManager.update({
+      await tx.matchManager.update({
         where: { id: userMatchManager.id },
         data: updateData,
-      }),
-      tx.matchManager.update({
+      });
+      await tx.matchManager.update({
         where: { id: opponentManager.id },
         data: opponentUpdateData,
-      }),
-      tx.user.update({
+      });
+      await tx.user.update({
         where: { userId: userId },
         data: { score: { increment: scoreChange } },
-      }),
-      tx.user.update({
+      });
+      await tx.user.update({
         where: { userId: opponentId },
-        data: { score: { increment: -scoreChange } },
-      }),
-      tx.fightRecord.create({
+        data: { score: { increment: opponentScoreChange } },
+      });
+      await tx.fightRecord.create({
         data: {
           username: username,
           opponentname: opponentname,
           result: result,
         },
-      }),
-      tx.fightRecord.create({
+      });
+      await tx.fightRecord.create({
         data: {
           username: opponentname,
           opponentname: username,
