@@ -96,6 +96,13 @@
                 <p id="game-result-text">결과가 여기에 표시됩니다.</p>
             </div>
         </section>
+
+        <!-- 랭킹 섹션 -->
+        <section id="ranking-section" style="display: none;">
+            <h2>랭킹</h2>
+            <ul id="ranking-list"></ul>
+        </section>
+
     </main>
 
     <footer>
@@ -342,11 +349,37 @@
                     }
 
                     const data = await response.json();
-                    document.getElementById('game-result-text').textContent = data.result;
+                    document.getElementById('game-result-text').textContent = `${data.user} vs ${data.opponent} - 결과: ${data.result} (점수: ${data.userScore} - ${data.opponentScore})`;
                 } catch (error) {
                     console.error('경기 시작에 실패했습니다:', error);
                 }
             });
+
+            // 랭킹 데이터 불러오기
+            async function loadRanking() {
+                try {
+                    const response = await fetch(`${baseUrl}/game/ranking`, {
+                        method: 'GET',
+                        
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('랭킹 데이터를 불러오는 데 실패했습니다.');
+                    }
+
+                    const data = await response.json();
+                    const rankingList = document.getElementById('ranking-list');
+                    rankingList.innerHTML = '';
+
+                    data.forEach((player, index) => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${index + 1}. ${player.name} - ${player.score} 점`;
+                        rankingList.appendChild(listItem);
+                    });
+                } catch (error) {
+                    console.error('랭킹 불러오기 에러:', error);
+                }
+            }
 
             // 섹션 표시 제어 함수
             function showGameSections() {
@@ -355,7 +388,9 @@
                 document.getElementById('shop-section').style.display = 'block';
                 document.getElementById('player-section').style.display = 'block';
                 document.getElementById('game-section').style.display = 'block';
+                document.getElementById('ranking-section').style.display = 'block';
                 getCashAmount();
+                loadRanking();
             }
         });
     </script>
