@@ -225,20 +225,20 @@
                     const packs = await response.json();
                     const packButtonsContainer = document.getElementById('pack-buttons');
 
-                    packButtonsContainer.innerHTML = ''; // Clear existing pack buttons
+                    packButtonsContainer.innerHTML = ''; // 기존 팩 버튼 삭제
 
                     packs.forEach(pack => {           
                         const packButton = document.createElement('button');
                         packButton.classList.add('pack-button');
-                        packButton.textContent = `${pack.name}\n${pack.price} 캐시`;
-                        packButton.dataset.packId = pack.id; // Set pack ID as a data attribute
+                        packButton.innerHTML = `${pack.name}<br>${pack.price} 캐시`;
+                        packButton.dataset.packId = pack.id; // 팩 ID를 데이터 속성으로 설정
 
                         packButton.addEventListener('click', () => selectPack(pack.id, packButton));
                         packButtonsContainer.appendChild(packButton);
                     });
 
                 } catch (error) {
-                    console.error('에러 로딩 팩:', error);
+                    console.error('팩 로딩 중 에러 발생:', error);
                 }
             }
 
