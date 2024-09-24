@@ -1,6 +1,6 @@
 import { CustomError } from '../utils/customError.js';
 import { getRandomUser, equipList } from '../services/playerService.js';
-import { getUsername, recordMatchResult } from '../services/gameService.js';
+import { getUsername, recordMatchResult ,rankings} from '../services/gameService.js';
 
 export const playGame = async (req, res, next) => {
   try {
@@ -61,23 +61,15 @@ export const playGame = async (req, res, next) => {
 
 export const getRanking = async (req, res, next) => {
   try {
-    const rankings = await prisma.matchManager.findMany({
-      select: {
-        userId: true,
-        winCount: true,
-        lossCount: true,
-      },
-    });
-
-    if (rankings.length === 0) {
+    let ranking= await rankings();
+    if (!Array.isArray(ranking)) {
+      throw new CustomError("랭킹 데이터가 유효하지 않습니다.", 500);
+    }
+    if (ranking.length === 0) {
       throw new CustomError("랭킹 데이터가 없습니다.", 404);
     }
 
-    const sortedRankings = rankings
-      .map((rank) => ({
-        userId: rank.userId,
-        score: rank.winCount * 10 + rank.lossCount * 7,
-      }))
+    const sortedRankings = ranking
       .sort((a, b) => b.score - a.score)
       .slice(0, 100);
 

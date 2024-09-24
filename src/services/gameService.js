@@ -106,3 +106,12 @@ export const getUsername = async (userId) => {
     throw error;
   }
 };
+
+export const rankings = async()=>{
+  return await prisma.user.findMany({
+    select: {
+      name: true,
+      score: true,
+    },
+  });
+}
