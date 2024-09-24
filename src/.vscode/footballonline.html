@@ -23,7 +23,7 @@
             <div id="login-form">
                 <form id="loginForm">
                     <label for="login-account">이메일:</label>
-                    <input type="email" id="login-account" name="account" required>
+                    <input type="text" id="login-account" name="account" required>
                     <label for="login-password">비밀번호:</label>
                     <input type="password" id="login-password" name="password" required>
                     <button type="submit" class="btn">로그인</button>
@@ -39,7 +39,7 @@
                 <h3>회원가입</h3>
                 <form id="signupForm">
                     <label for="signup-account">이메일:</label>
-                    <input type="email" id="signup-account" name="account" required>
+                    <input type="text" id="signup-account" name="account" required>
                     <label for="signup-password">비밀번호:</label>
                     <input type="password" id="signup-password" name="password" required>
                     <br>
@@ -219,12 +219,10 @@
                         },
                         body: JSON.stringify({ packId: 1 })
                     });
-
                     if (!response.ok) {
                         const errorText = await response.json();
                         throw new Error(errorText.message);
                     }
-
                     const data = await response.json();
                     document.getElementById('draw-result').textContent = `당첨된 선수: ${data.players.join(', ')}`;
                     await getCashAmount(); // 캐시 잔액 갱신
@@ -247,12 +245,11 @@
                     if (!response.ok) {
                         throw new Error('내 선수 목록을 불러오는 데 실패했습니다.');
                     }
-
                     const data = await response.json();
                     const allPlayersList = document.getElementById('all-players-list');
                     allPlayersList.innerHTML = ''; // 초기화
                     data.players.forEach(player => {
-                        const option = document.createElement('li'); // li로 변경하여 목록으로 표시
+                        const option = document.createElement('li');
                         option.textContent = player;
                         allPlayersList.appendChild(option);
                     });
