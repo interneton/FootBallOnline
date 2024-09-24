@@ -41,7 +41,7 @@ export const unequipPlayer = async (req, res, next) => {
     await playerService.unequipPlayer(userId, soccerPlayerId);
     res.status(200).json({ message: "선수 장착 해제 완료" });
   } catch (error) {
-    next(error); // 에러를 next로 전달
+    next(error);
   }
 };
 
@@ -51,7 +51,19 @@ export const getAllPlayerStats = async (req, res, next) => {
     const players = await playerService.getAllPlayerStats();
     res.status(200).json(players);
   } catch (error) {
-    next(error); // 에러를 next로 전달
+    next(error);
+  }
+};
+
+// 나의 보유 선수 조회
+export const getInvenPlayerStats = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+
+    const players = await playerService.getMyPlayer(userId);
+    res.status(200).json({ message: "선수 목록" , players});
+  } catch (error) {
+    next(error);
   }
 };
 

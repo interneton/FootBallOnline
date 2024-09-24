@@ -25,13 +25,14 @@ export const getAllPlayerStats = async () => {
       goalDecision: true,
       shootPower: true,
       defense: true,
-      stamina: true
+      stamina: true,
+      rank: true,
     }
   });
 };
 
 // 자기 자신의 선수 명단 및 능력치 조회
-export const getAllMyPlayer = async(userId)=>{
+export const getMyPlayer = async(userId)=>{
     return await prisma.userPlayer.findMany({
       where: { userId },
       select:{
@@ -43,7 +44,8 @@ export const getAllMyPlayer = async(userId)=>{
             goalDecision: true,
             shootPower: true,
             defense: true,
-            stamina: true
+            stamina: true,
+            rank: true
           }
         }
       }
@@ -66,7 +68,8 @@ export const equipList = async(userId)=>{
           goalDecision: true,
           shootPower: true,
           defense: true,
-          stamina: true
+          stamina: true,
+          rank : true
         }
       }
     }
@@ -83,7 +86,7 @@ export const getPlayersByRank = async(rank) => {
       goalDecision: true,
       shootPower: true,
       defense: true,
-      stamina: true
+      stamina: true,
     }
   });
 }

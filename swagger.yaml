@@ -4,9 +4,8 @@ info:
   description: API documentation for your application
   version: 1.0.0
 servers:
-  - url: http://localhost:3000/ 
+  - url: http://localhost:3000/
     description: Local server
-
 components:
   securitySchemes:
     bearerAuth:
@@ -173,24 +172,92 @@ components:
     PlayGameRequest:
       type: object
       properties:
-        userId:
-          type: integer
-          description: ID of the user playing the game
         result:
           type: string
           description: Result of the game
           enum: [win, loss, draw]
       required:
-        - userId
         - result
-    EquipPlayerRequest:
+    SoccerPlayer: 
       type: object
       properties:
         soccerPlayerId:
           type: integer
           description: Soccer Player ID
-      required:
-        - soccerPlayerId
+        name:
+          type: string
+          description: Player's name
+        speed:
+          type: integer
+          description: Speed of the player
+        goalDecision:
+          type: integer
+          description: Goal Decision of the player
+        shootPower:
+          type: integer
+          description: Shoot Power of the player
+        defense:
+          type: integer
+          description: Defense of the player
+        stamina:
+          type: integer
+          description: Stamina of the player
+        rank:
+          type: string
+          description: Rank of the player
+    AllPlayersResponse:
+      type: object
+      properties:
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/SoccerPlayer'
+    MyPlayersResponse:
+      type: object
+      properties:
+        players:
+          type: array
+          items:
+            type: object
+            properties:
+              soccerPlayerId:
+                type: integer
+                description: Soccer Player ID
+              name:
+                type: string
+                description: Player's name
+              speed:
+                type: integer
+                description: Speed of the player
+              goalDecision:
+                type: integer
+                description: Goal Decision of the player
+              shootPower:
+                type: integer
+                description: Shoot Power of the player
+              defense:
+                type: integer
+                description: Defense of the player
+              stamina:
+                type: integer
+                description: Stamina of the player
+              rank:
+                type: string
+                description: Rank of the player
+
+    EquipPlayerRequest:
+        type: object
+        properties:
+          soccerPlayerId:
+            type: integer
+            description: Soccer Player ID
+        required:
+          - soccerPlayerId
+    EquipPlayerResponse:
+        type: object
+        properties:
+          message:
+            type: string    
     RegisterPlayerRequest:
       type: object
       properties:
@@ -219,10 +286,8 @@ components:
         - shootPower
         - defense
         - stamina
-
 security:
   - bearerAuth: []
-
 paths:
   /token/refresh-token:
     post:
@@ -255,7 +320,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /users/login:
     post:
       summary: Log in user
@@ -280,7 +344,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /users/signup:
     post:
       summary: Register a new user
@@ -305,7 +368,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /shop/purchase:
     post:
       summary: Purchase cash
@@ -332,7 +394,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /shop/getCashAmount:
     get:
       summary: Get current cash amount
@@ -357,7 +418,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /shop/draw:
     post:
       summary: Draw a player
@@ -384,7 +444,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /shop/makepack:
     post:
       summary: Create a new player pack
@@ -411,10 +470,10 @@ paths:
                 properties:
                   message:
                     type: string
-
   /players/equip:
     post:
       summary: Equip a player
+      description: Equip a player by their ID.
       security:
         - bearerAuth: []
       requestBody:
@@ -428,10 +487,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
+                $ref: '#/components/schemas/EquipPlayerResponse'
         '400':
           description: Bad request
           content:
@@ -441,10 +497,20 @@ paths:
                 properties:
                   message:
                     type: string
-
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized"
   /players/unequip:
     post:
       summary: Unequip a player
+      description: Unequip a player by their ID.
       security:
         - bearerAuth: []
       requestBody:
@@ -458,12 +524,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-        '404':
-          description: Player not equipped
+                $ref: '#/components/schemas/EquipPlayerResponse'
+        '400':
+          description: Bad request
           content:
             application/json:
               schema:
@@ -471,7 +534,16 @@ paths:
                 properties:
                   message:
                     type: string
-
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized"
   /players/stats:
     get:
       summary: Get all player stats
@@ -497,7 +569,6 @@ paths:
                       type: integer
                     stamina:
                       type: integer
-
   /players/register:
     post:
       summary: Register a new player
@@ -529,7 +600,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /game/play:
     post:
       summary: Record match result
@@ -546,7 +616,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PlayGameResponse'
+                type: object
+                properties:
+                  message:
+                    type: string
         '400':
           description: Bad request
           content:
@@ -556,7 +629,6 @@ paths:
                 properties:
                   message:
                     type: string
-
   /game/ranking:
     get:
       summary: Get user rankings
@@ -583,3 +655,37 @@ paths:
                 properties:
                   message:
                     type: string
+  /players/getAllPlayer:
+    get:
+      summary: Get all player stats
+      description: Retrieve stats for all players in the database.
+      responses:
+        '200':
+          description: All player stats retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AllPlayersResponse'
+  /players/getInvenPlayer:
+    get:
+      summary: Get stats for logged-in user's players
+      description: Retrieve stats for the players owned by the currently logged-in user.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User's player stats retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyPlayersResponse'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Unauthorized"
