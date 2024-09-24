@@ -1,32 +1,18 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="ko">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Online</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-      input {
-        width: calc(100% - 20px);
-        padding: 10px;
-        margin-bottom: 15px; 
-        border: 1px solid #ccc;
-        border-radius: 4px;
-      }
-  
-      #login-message, #signup-message {
-        margin-top: 10px;
-        color: red;
-      }
-    </style>
+    <meta charset="UTF-8"> <!-- 문자 인코딩 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- 화면 크기 설정 -->
+    <title>Football Online</title> <!-- 페이지 제목 -->
+    <link rel="stylesheet" href="styles.css"> <!-- 스타일시트 연결 -->
 </head>
 
 <body>
     <header>
-        <h1>Football Online</h1>
-        <div id=logoutBtnBox>
-            <button id="logout-btn" style="display: none;">로그아웃</button>
+        <h1>Football Online</h1> <!-- 헤더 제목 -->
+        <div id="logoutBtnBox">
+            <button id="logout-btn" style="display: none;">로그아웃</button> <!-- 로그아웃 버튼 -->
         </div>
     </header>
 
@@ -38,12 +24,12 @@
                 <h3>로그인</h3>
                 <form id="loginForm">
                     <label for="login-account">이메일:</label>
-                    <input type="email" id="login-account" name="account" required>
+                    <input type="email" id="login-account" name="account" required> <!-- 이메일 입력 필드 -->
                     <label for="login-password">비밀번호:</label>
-                    <input type="password" id="login-password" name="password" required>
-                    <button type="submit" class="btn">로그인</button>
+                    <input type="password" id="login-password" name="password" required> <!-- 비밀번호 입력 필드 -->
+                    <button type="submit" class="btn">로그인</button> <!-- 로그인 버튼 -->
                 </form>
-                <p id="login-message"></p>
+                <p id="login-message"></p> <!-- 로그인 메시지 표시 -->
             </div>
         </section>
 
@@ -54,64 +40,64 @@
                 <h3>회원가입</h3>
                 <form id="signupForm">
                     <label for="signup-account">이메일:</label>
-                    <input type="email" id="signup-account" name="account" required>
+                    <input type="email" id="signup-account" name="account" required> <!-- 이메일 입력 필드 -->
                     <label for="signup-password">비밀번호:</label>
-                    <input type="password" id="signup-password" name="password" required>
-                    <br><label for="signup-name">이름:</label>
-                    <input type="text" id="signup-name" name="name" required>
+                    <input type="password" id="signup-password" name="password" required> <!-- 비밀번호 입력 필드 -->
+                    <br>
+                    <label for="signup-name">이름:</label>
+                    <input type="text" id="signup-name" name="name" required> <!-- 이름 입력 필드 -->
                     <label for="signup-teamName">팀 이름:</label>
-                    <input type="text" id="signup-teamName" name="teamName" required>
-                    <button type="submit" class="btn">회원가입</button>
+                    <input type="text" id="signup-teamName" name="teamName" required> <!-- 팀 이름 입력 필드 -->
+                    <button type="submit" class="btn">회원가입</button> <!-- 회원가입 버튼 -->
                 </form>
-                <p id="signup-message"></p>
+                <p id="signup-message"></p> <!-- 회원가입 메시지 표시 -->
             </div>
         </section>
 
         <!-- 게임 섹션 -->
         <section id="game-section" style="display: none;">
             <h2>경기 시작</h2>
-            <button id="start-game-btn" class="btn">경기 시작하기</button>
+            <button id="start-game-btn" class="btn">경기 시작하기</button> <!-- 경기 시작 버튼 -->
             <div id="game-result">
                 <h3>경기 결과</h3>
-                <p id="game-result-text">결과가 여기에 표시됩니다.</p>
+                <p id="game-result-text">결과가 여기에 표시됩니다.</p> <!-- 경기 결과 표시 -->
             </div>
         </section>
 
         <!-- 선수 관리 섹션 -->
         <section id="player-section" style="display: none;">
             <h2>선수 관리</h2>
-            <div id="equipped-players">
-                <h3>장착된 선수 목록</h3>
-                <ul id="equipped-players-list"></ul>
-                <button id="unequip-player-btn" class="btn">선수 장착 해제</button>
-            </div>
-            <div id="all-players">
-                <h3>모든 선수 목록</h3>
-                <ul id="all-players-list"></ul>
+            <div id="player-management">
+                <button id="view-players-btn" class="btn">보유 선수 조회</button> <!-- 보유 선수 조회 버튼 -->
+                <div id="all-players">
+                    <h3>모든 선수 목록</h3>
+                    <ul id="all-players-list"></ul> <!-- 모든 선수 목록 표시 -->
+                </div>
             </div>
         </section>
 
         <!-- 상점 섹션 -->
         <section id="shop-section" style="display: none;">
             <h2>가챠상점</h2>
-            <button id="draw-player-1-btn" class="btn">1회 뽑기 (100캐쉬)</button>
-            <button id="draw-player-5-btn" class="btn">5회 뽑기 (500캐쉬)</button>
-            <button id="draw-player-10-btn" class="btn">10회 뽑기 (1000캐쉬)</button>
-            <p id="draw-result">선수 뽑기 결과가 여기에 표시됩니다.</p>
-            <p id="cash-amount">보유 캐시: </p>
+            <button id="draw-player-1-btn" class="btn" data-pack-id="1">1회 뽑기 (100캐쉬)</button> <!-- 1회 뽑기 버튼 -->
+            <button id="draw-player-5-btn" class="btn" data-pack-id="2">5회 뽑기 (500캐쉬)</button> <!-- 5회 뽑기 버튼 -->
+            <button id="draw-player-10-btn" class="btn" data-pack-id="3">10회 뽑기 (1000캐쉬)</button> <!-- 10회 뽑기 버튼 -->
+            <p id="draw-result">선수 뽑기 결과가 여기에 표시됩니다.</p> <!-- 뽑기 결과 표시 -->
+            <p id="cash-amount-shop">보유 캐시: </p> <!-- 보유 캐시 표시 -->
         </section>
+
         <!-- 캐쉬 구매 섹션 -->
         <section id="cashShop-section" style="display: none;">
             <h2>캐쉬상점</h2>
-            <button id="buy-cash-100-btn" class="btn">100캐쉬 구매하기</button>
-            <button id="buy-cash-500-btn" class="btn">500캐쉬 구매하기</button>
-            <button id="buy-cash-1000-btn" class="btn">1000캐쉬 구매하기</button>
-            <p id="cash-amount">보유 캐시: </p>
+            <button id="buy-cash-100-btn" class="btn">100캐쉬 구매하기</button> <!-- 100캐쉬 구매 버튼 -->
+            <button id="buy-cash-500-btn" class="btn">500캐쉬 구매하기</button> <!-- 500캐쉬 구매 버튼 -->
+            <button id="buy-cash-1000-btn" class="btn">1000캐쉬 구매하기</button> <!-- 1000캐쉬 구매 버튼 -->
+            <p id="cash-amount-cashshop">보유 캐시: </p> <!-- 보유 캐시 표시 -->
         </section>
     </main>
 
     <footer>
-        <p>&copy; 2024 Football Online</p>
+        <p>&copy; 2024 Football Online</p> <!-- 푸터 -->
     </footer>
 
     <script>
@@ -142,20 +128,24 @@
                     }
 
                     const { cashAmount } = await response.json();
-                    document.getElementById('cash-amount').textContent = `보유 캐시: ${cashAmount}`;
+                    document.getElementById('cash-amount-cashshop').textContent = `보유 캐시: ${cashAmount}`;
+                    document.getElementById('cash-amount-shop').textContent = `보유 캐시: ${cashAmount}`;
                     alert(`${amount} 캐쉬를 성공적으로 구매했습니다.`);
                 } catch (error) {
                     alert(`오류: ${error.message}`);
                 }
             }
-            // 선수 뽑기 처리
+
+            // 가챠
             document.getElementById('draw-player-1-btn').addEventListener('click', () => drawPlayer(1));
             document.getElementById('draw-player-5-btn').addEventListener('click', () => drawPlayer(5));
             document.getElementById('draw-player-10-btn').addEventListener('click', () => drawPlayer(10));
 
-            async function drawPlayer(count) {
+            async function drawPlayer(drawCount) { // 수정: drawCount를 파라미터로 받음
                 const token = localStorage.getItem('accessToken');
-                if (!token) return;
+                if (!token) return alert('로그인이 필요합니다.');
+
+                const packId = 1; // 팩 ID가 팩 ID로 설정되어 있는지 확인
 
                 try {
                     const response = await fetch(`${baseUrl}/shop/draw`, {
@@ -164,16 +154,82 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ count }) // 뽑기 수 전달
+                        body: JSON.stringify({ packId, drawCount }) // 수정: drawCount를 payload에 추가
                     });
+
                     if (!response.ok) {
                         const errorText = await response.text();
                         throw new Error(`선수 뽑기 실패: ${errorText}`);
                     }
 
-                    const { players, cashAmount } = await response.json();
-                    document.getElementById('draw-result').textContent = `뽑힌 선수들: ${players.join(', ')}`;
-                    document.getElementById('cash-amount').textContent = `보유 캐시: ${cashAmount}`;
+                    const data = await response.json();
+                    const playerNames = data.selectedPlayers.map(player => player.name).join(', '); // 표시할 플레이어 이름 가입하기
+                    document.getElementById('draw-result').textContent = `뽑은 선수: ${playerNames}`; // 플레이어 표시
+                    document.getElementById('cash-amount-shop').textContent = `보유 캐시: ${data.cashAmount}`;
+
+                } catch (error) {
+                    alert(`오류: ${error.message}`);
+                }
+            }
+            // 보유 선수 조회
+            document.getElementById('view-players-btn').addEventListener('click', async () => {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                try {
+                    const response = await fetch(`${baseUrl}/player/list`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`선수 목록 조회 실패: ${errorText}`);
+                    }
+
+                    const players = await response.json();
+                    const playerList = document.getElementById('all-players-list');
+                    playerList.innerHTML = '';
+
+                    players.forEach(player => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${player.name} (스피드: ${player.speed}, 슛 파워: ${player.shootPower})`;
+
+                        const equipButton = document.createElement('button');
+                        equipButton.textContent = '장착';
+                        equipButton.addEventListener('click', () => equipPlayer(player.id));
+                        listItem.appendChild(equipButton);
+
+                        playerList.appendChild(listItem);
+                    });
+                } catch (error) {
+                    alert(`오류: ${error.message}`);
+                }
+            });
+
+            // 선수 장착 처리
+            async function equipPlayer(playerId) {
+                const token = localStorage.getItem('accessToken');
+                if (!token) return;
+
+                try {
+                    const response = await fetch(`${baseUrl}/player/equip`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ playerId })
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`선수 장착 실패: ${errorText}`);
+                    }
+
+                    alert('선수가 성공적으로 장착되었습니다.');
                 } catch (error) {
                     alert(`오류: ${error.message}`);
                 }
@@ -197,41 +253,17 @@
                         throw new Error(`로그인 실패: ${errorText}`);
                     }
 
-                    const { accessToken } = await response.json();
+                    const { accessToken, cashAmount } = await response.json();
                     localStorage.setItem('accessToken', accessToken);
                     document.getElementById('login-message').textContent = '로그인 성공!';
-                    showGameSections();
-                    document.getElementById('signup-section').style.display = 'none';
+                    document.getElementById('cash-amount-cashshop').textContent = `보유 캐시: ${cashAmount}`;
+                    document.getElementById('cash-amount-shop').textContent = `보유 캐시: ${cashAmount}`;
                     document.getElementById('cashShop-section').style.display = 'block';
+                    document.getElementById('signup-section').style.display = 'none';
+                    showGameSections();
+
                 } catch (error) {
                     document.getElementById('login-message').textContent = `오류: ${error.message}`;
-                }
-            });
-
-            // 회원가입 처리
-            document.getElementById('signupForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const account = document.getElementById('signup-account').value;
-                const password = document.getElementById('signup-password').value;
-                const name = document.getElementById('signup-name').value;
-                const teamName = document.getElementById('signup-teamName').value;
-
-                try {
-                    const response = await fetch(`${baseUrl}/users/signup`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ account, password, name, teamName }),
-                    });
-
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`회원가입 실패: ${errorText}`);
-                    }
-
-                    const { message } = await response.json();
-                    document.getElementById('signup-message').textContent = '회원가입 성공! ' + message;
-                } catch (error) {
-                    document.getElementById('signup-message').textContent = `오류: ${error.message}`;
                 }
             });
 
