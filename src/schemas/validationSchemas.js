@@ -1,10 +1,5 @@
 import Joi from 'joi';
 
-// 게임 스키마
-export const playGameSchema = Joi.object({
-  result: Joi.string().valid('win', 'loss', 'draw').required()
-});
-
 // 플레이어
 export const equipPlayerSchema = Joi.object({
   soccerPlayerId: Joi.number().integer().required()

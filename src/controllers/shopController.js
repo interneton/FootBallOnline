@@ -22,7 +22,7 @@ export const getCashAmount = async (req, res, next) => {
     const cashAmount = await getCash(userId);
     res.status(200).json({ cashAmount });
   } catch (error) {
-    next(error); 
+    next(error);
   }
 };
 
