@@ -2,16 +2,38 @@ import { prisma } from "../utils/prisma/client.js";
 
 // 선수 장착
 export const equipPlayer = async (userId, soccerPlayerId) => {
-  return await prisma.userPlayer.updateMany({
-    where: { userId, soccerPlayerId },
+  const player = await prisma.userPlayer.findFirst({
+    where: {
+      userId: userId,
+      soccerPlayerId: soccerPlayerId,
+    },
+  });
+
+  if (!player) {
+    throw new Error('선수가 존재하지 않습니다');
+  }
+
+  return await prisma.userPlayer.update({
+    where: { userPlayerId: player.userPlayerId },
     data: { isEquipped: true },
   });
 };
 
 // 선수 장착 해제
 export const unequipPlayer = async (userId, soccerPlayerId) => {
-  return await prisma.userPlayer.updateMany({
-    where: { userId, soccerPlayerId },
+  const player = await prisma.userPlayer.findFirst({
+    where: {
+      userId: userId,
+      soccerPlayerId: soccerPlayerId,
+    },
+  });
+
+  if (!player) {
+    throw new Error('선수가 없거나 선수가 장착되어 있지 않습니다');
+  }
+
+  return await prisma.userPlayer.update({
+    where: { userPlayerId: player.userPlayerId },
     data: { isEquipped: false },
   });
 };
@@ -36,6 +58,7 @@ export const getMyPlayer = async(userId)=>{
     return await prisma.userPlayer.findMany({
       where: { userId },
       select:{
+        isEquipped: true, 
         soccerPlayer: {
           select: {
             soccerPlayerId: true,

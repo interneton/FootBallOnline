@@ -85,8 +85,6 @@
             <div>
                 <h3>모든 선수 목록</h3>
                 <ul id="all-players-list"></ul>
-                <button id="equip-player-btn" class="btn">선수 장착하기</button>
-                <button id="unequip-player-btn" class="btn">선수 해제하기</button>
             </div>
         </section>
         <!-- 경기 섹션 -->
@@ -230,8 +228,8 @@
                     console.error('선수 뽑기에 실패했습니다:', error);
                 }
             }
-            // 내 선수 목록 보기 처리
-            document.getElementById('show-my-players-btn').addEventListener('click', async () => {
+
+            async function loadPlayers() {
                 const token = localStorage.getItem('accessToken');
                 if (!token) return;
 
@@ -244,28 +242,42 @@
                     });
 
                     if (!response.ok) {
-                        throw new Error('내 선수 목록을 불러오는 데 실패했습니다.');
+                        throw new Error('선수 데이터를 불러오지 못했습니다.');
                     }
-                    
+
                     const data = await response.json();
-                    const allPlayersList = document.getElementById('all-players-list');
-                    allPlayersList.innerHTML = ''; // 초기화
-                    
+                    const equippedPlayersList = document.getElementById('equipped-players-list');
+                    const inventoryPlayersList = document.getElementById('all-players-list');
+
+                    equippedPlayersList.innerHTML = '';
+                    inventoryPlayersList.innerHTML = '';
+
                     data.players.forEach(player => {
                         const listItem = document.createElement('li');
-                        listItem.textContent = `${player.soccerPlayer.name} - 속도: ${player.soccerPlayer.speed}, 슛파워: ${player.soccerPlayer.shootPower}`;
-                        listItem.dataset.playerId = player.soccerPlayer.soccerPlayerId;
-                        allPlayersList.appendChild(listItem);
+                        listItem.textContent = `${player.soccerPlayer.name} - 스피드: ${player.soccerPlayer.speed}, 슛 파워: ${player.soccerPlayer.shootPower}`;
+                        
+                        if (player.isEquipped) {    
+                            const unequipButton = document.createElement('button');
+                            unequipButton.textContent = '해제';
+                            unequipButton.classList.add('btn');
+                            unequipButton.addEventListener('click', () => unequipPlayer(player.soccerPlayer.soccerPlayerId));
+                            listItem.appendChild(unequipButton);
+                            equippedPlayersList.appendChild(listItem);
+                        } else {                    
+                            const equipButton = document.createElement('button');
+                            equipButton.textContent = '장착';
+                            equipButton.classList.add('btn');
+                            equipButton.addEventListener('click', () => equipPlayer(player.soccerPlayer.soccerPlayerId));
+                            listItem.appendChild(equipButton);
+                            inventoryPlayersList.appendChild(listItem);
+                        }
                     });
                 } catch (error) {
-                    console.error(error);
+                    console.error('선수 불러오기 에러:', error);
                 }
-            });
+            }
 
-            // 선수 장착 처리
-            document.getElementById('equip-player-btn').addEventListener('click', async () => {
-                const selectedPlayer = document.getElementById('all-players-list').value;
-                if (!selectedPlayer) return;
+            async function equipPlayer(soccerPlayerId) {
                 const token = localStorage.getItem('accessToken');
                 try {
                     const response = await fetch(`${baseUrl}/players/equip`, {
@@ -274,7 +286,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ player: selectedPlayer })
+                        body: JSON.stringify({ soccerPlayerId })
                     });
 
                     if (!response.ok) {
@@ -282,17 +294,13 @@
                         throw new Error(errorText.message);
                     }
 
-                    // 선수 장착 후 갱신
-                    await getEquippedPlayers();
+                    await loadPlayers();
                 } catch (error) {
-                    console.error('선수 장착에 실패했습니다:', error);
+                    console.error('Failed to equip player:', error);
                 }
-            });
+            }
 
-            // 선수 해제 처리
-            document.getElementById('unequip-player-btn').addEventListener('click', async () => {
-                const selectedPlayer = document.getElementById('equipped-players-list').value;
-                if (!selectedPlayer) return;
+            async function unequipPlayer(soccerPlayerId) {
                 const token = localStorage.getItem('accessToken');
                 try {
                     const response = await fetch(`${baseUrl}/players/unequip`, {
@@ -301,7 +309,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ player: selectedPlayer })
+                        body: JSON.stringify({ soccerPlayerId })
                     });
 
                     if (!response.ok) {
@@ -309,71 +317,14 @@
                         throw new Error(errorText.message);
                     }
 
-                    // 선수 해제 후 갱신
-                    await getEquippedPlayers();
+                    await loadPlayers();
                 } catch (error) {
-                    console.error('선수 해제에 실패했습니다:', error);
-                }
-            });
-
-            // 장착된 선수 조회
-            async function getEquippedPlayers() {
-                const token = localStorage.getItem('accessToken');
-                try {
-                    const response = await fetch(`${baseUrl}/players/getEquipped`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('장착된 선수를 불러오는 데 실패했습니다.');
-                    }
-
-                    const data = await response.json();
-                    const equippedPlayersList = document.getElementById('equipped-players-list');
-                    equippedPlayersList.innerHTML = ''; // 초기화
-                    data.players.forEach(player => {
-                        const option = document.createElement('option');
-                        option.value = player;
-                        option.textContent = player;
-                        equippedPlayersList.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error(error);
+                    console.error('Failed to unequip player:', error);
                 }
             }
 
-            // 모든 선수 조회
-            async function getAllPlayers() {
-                const token = localStorage.getItem('accessToken');
-                try {
-                    const response = await fetch(`${baseUrl}/players`, {
-                        method: 'GET',
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('모든 선수를 불러오는 데 실패했습니다.');
-                    }
-
-                    const data = await response.json();
-                    const allPlayersList = document.getElementById('all-players-list');
-                    allPlayersList.innerHTML = ''; // 초기화
-                    data.players.forEach(player => {
-                        const option = document.createElement('option');
-                        option.value = player;
-                        option.textContent = player;
-                        allPlayersList.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error(error);
-                }
-            }
-
+            loadPlayers();
+         
             // 경기 시작 처리
             document.getElementById('start-game-btn').addEventListener('click', async () => {
                 const token = localStorage.getItem('accessToken');
@@ -405,8 +356,6 @@
                 document.getElementById('player-section').style.display = 'block';
                 document.getElementById('game-section').style.display = 'block';
                 getCashAmount();
-                getAllPlayers();
-                getEquippedPlayers();
             }
         });
     </script>
