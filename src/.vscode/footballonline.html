@@ -234,6 +234,7 @@
             document.getElementById('show-my-players-btn').addEventListener('click', async () => {
                 const token = localStorage.getItem('accessToken');
                 if (!token) return;
+
                 try {
                     const response = await fetch(`${baseUrl}/players/getInvenPlayer`, {
                         method: 'GET',
@@ -245,13 +246,16 @@
                     if (!response.ok) {
                         throw new Error('내 선수 목록을 불러오는 데 실패했습니다.');
                     }
+                    
                     const data = await response.json();
                     const allPlayersList = document.getElementById('all-players-list');
                     allPlayersList.innerHTML = ''; // 초기화
+                    
                     data.players.forEach(player => {
-                        const option = document.createElement('li');
-                        option.textContent = player;
-                        allPlayersList.appendChild(option);
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `${player.soccerPlayer.name} - 속도: ${player.soccerPlayer.speed}, 슛파워: ${player.soccerPlayer.shootPower}`;
+                        listItem.dataset.playerId = player.soccerPlayer.soccerPlayerId;
+                        allPlayersList.appendChild(listItem);
                     });
                 } catch (error) {
                     console.error(error);
