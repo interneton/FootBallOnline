@@ -267,6 +267,8 @@
                             const unequipButton = document.createElement('button');
                             unequipButton.textContent = '해제';
                             unequipButton.classList.add('btn');
+                            unequipButton.style.padding = '3px 6px';
+                            unequipButton.style.fontSize = '12px';
                             unequipButton.addEventListener('click', () => unequipPlayer(player.soccerPlayer.soccerPlayerId));
                             listItem.appendChild(unequipButton);
                             equippedPlayersList.appendChild(listItem);
@@ -274,6 +276,8 @@
                             const equipButton = document.createElement('button');
                             equipButton.textContent = '장착';
                             equipButton.classList.add('btn');
+                            equipButton.style.padding = '3px 6px';
+                            equipButton.style.fontSize = '12px';
                             equipButton.addEventListener('click', () => equipPlayer(player.soccerPlayer.soccerPlayerId));
                             listItem.appendChild(equipButton);
                             inventoryPlayersList.appendChild(listItem);
