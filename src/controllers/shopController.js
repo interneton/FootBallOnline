@@ -1,4 +1,4 @@
-import { getPackInfoOne, purch, getCash, makePack, getPlayersByRank, createUserPlayer } from "../services/shopService.js";
+import { getPackInfoOne, purch, getCash, makePack, getPlayersByRank, createUserPlayer, getPackInfo} from "../services/shopService.js";
 import { CustomError } from '../utils/customError.js'; 
 
 // 게임 내 캐시 구매
@@ -79,6 +79,34 @@ export const makePackcontroller = async (req, res, next) => {
     const packdata = await makePack(packname, sspb, apb, bpb, cpb, fpb, price);
 
     return res.status(201).json({ message: "팩 생성 완료", packdata });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getPackDetails = async (req, res, next) => {
+  try {
+    const packs = await getPackInfo();
+
+    const packDetails = await Promise.all(
+      packs.map(async (pack) => {
+        const availablePlayers = {};
+
+        // Fetch players for each rank
+        availablePlayers['SSPB'] = await getPlayersByRank('S');
+        availablePlayers['APB'] = await getPlayersByRank('A');
+        availablePlayers['BPB'] = await getPlayersByRank('B');
+        availablePlayers['CPB'] = await getPlayersByRank('C');
+        availablePlayers['FPB'] = await getPlayersByRank('F');
+
+        return {
+          ...pack,
+          availablePlayers,
+        };
+      })
+    );
+
+    res.status(200).json(packDetails);
   } catch (error) {
     next(error);
   }

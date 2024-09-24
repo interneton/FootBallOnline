@@ -66,10 +66,12 @@
         <section id="shop-section" style="display: none;">
             <h2>가챠 상점</h2>
             <p>사용 가능한 팩을 선택하여 선수를 뽑으세요.</p>
-            <select id="pack-select"></select>
-            <button id="draw-player-1-btn" class="btn">1회 뽑기 (100 캐시)</button>
-            <button id="draw-player-5-btn" class="btn">5회 뽑기 (500 캐시)</button>
-            <button id="draw-player-10-btn" class="btn">10회 뽑기 (1000 캐시)</button>
+            <div class="scroll-container">
+                <div id="pack-buttons" class="pack-buttons"></div>
+            </div>
+            <button id="draw-player-1-btn" class="btn">1회 뽑기</button>
+            <button id="draw-player-5-btn" class="btn">5회 뽑기</button>
+            <button id="draw-player-10-btn" class="btn">10회 뽑기</button>
             <p id="draw-result">선수 뽑기 결과가 여기에 표시됩니다.</p>
             <h3>보유 캐시: <span id="cash-amount"></span></h3>
         </section>
@@ -208,33 +210,121 @@
             }
 
             // 가챠 뽑기 처리
+            async function loadPacks() {
+                try {
+                    const response = await fetch(`${baseUrl}/shop/packs`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('팩 정보를 불러오지 못했습니다.');
+                    }
+
+                    const packs = await response.json();
+                    const packButtonsContainer = document.getElementById('pack-buttons');
+
+                    packButtonsContainer.innerHTML = ''; // Clear existing pack buttons
+
+                    packs.forEach(pack => {           
+                        const packButton = document.createElement('button');
+                        packButton.classList.add('pack-button');
+                        packButton.textContent = `${pack.name}\n${pack.price} 캐시`;
+                        packButton.dataset.packId = pack.id; // Set pack ID as a data attribute
+
+                        packButton.addEventListener('click', () => selectPack(pack.id, packButton));
+                        packButtonsContainer.appendChild(packButton);
+                    });
+
+                } catch (error) {
+                    console.error('에러 로딩 팩:', error);
+                }
+            }
+
+            let selectedPackId = null;
+
+            function selectPack(packId, button) {
+                selectedPackId = packId;
+
+                const packButtons = document.querySelectorAll('.pack-button');
+                packButtons.forEach(btn => btn.classList.remove('selected'));
+
+                button.classList.add('selected');
+            }
+
             document.getElementById('draw-player-1-btn').addEventListener('click', () => drawPlayers(1));
             document.getElementById('draw-player-5-btn').addEventListener('click', () => drawPlayers(5));
             document.getElementById('draw-player-10-btn').addEventListener('click', () => drawPlayers(10));
 
             async function drawPlayers(count) {
                 const token = localStorage.getItem('accessToken');
+                
                 if (!token) return;
+                if (!selectedPackId) {
+                    alert('팩을 선택해주세요!');
+                    return;
+                }
+
                 try {
-                    const response = await fetch(`${baseUrl}/shop/draw`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}`
-                        },
-                        body: JSON.stringify({ packId: 1 })
-                    });
-                    if (!response.ok) {
-                        const errorText = await response.json();
-                        throw new Error(errorText.message);
+                    const drawnPlayers = [];
+
+                    for (let i = 0; i < count; i++) {
+                        const response = await fetch(`${baseUrl}/shop/draw`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ packId: selectedPackId })
+                        });
+
+                        if (!response.ok) {
+                            const errorText = await response.json();
+                            throw new Error(errorText.message);
+                        }
+
+                        const data = await response.json();
+                        drawnPlayers.push(data.selectedPlayer);
                     }
-                    const data = await response.json();
-                    document.getElementById('draw-result').textContent = `당첨된 선수: ${data.players.join(', ')}`;
-                    await getCashAmount(); // 캐시 잔액 갱신
+
+                    const drawResultElement = document.getElementById('draw-result');
+                    drawResultElement.innerHTML = '';
+
+                    drawnPlayers.forEach((player, index) => {
+                        const playerInfo = document.createElement('p');
+                        playerInfo.textContent = `선수 ${index + 1}: ${player.name} - 스피드: ${player.speed}, 슛 파워: ${player.shootPower}, 골 결정력: ${player.goalDecision}, 수비: ${player.defense}, 스태미너 : ${player.shootPower} 랭크 : ${player.rank}`;
+                        drawResultElement.appendChild(playerInfo);
+                    });
+
+                    await getCashAmount();
+
                 } catch (error) {
-                    console.error('선수 뽑기에 실패했습니다:', error);
+                    console.error('선수 뽑기 실패:', error);
+                }
+}
+            async function getCashAmount() {
+                try {
+                    const response = await fetch(`${baseUrl}/shop/getCashAmount`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('캐시 받아오기 실패');
+                    }
+
+                    const data = await response.json();
+                    document.getElementById('cash-amount').textContent = `${data.cashAmount} 캐시`;
+                } catch (error) {
+                    console.error(error);
                 }
             }
+
+            loadPacks();
 
             async function loadPlayers() {
                 const token = localStorage.getItem('accessToken');

@@ -4,6 +4,7 @@ import { prisma } from "../utils/prisma/client.js";
 export const getPackInfo = async () => {
   return await prisma.pack.findMany({
     select: {
+      id: true,
       name: true,
       price: true,
       SSPB: true,
@@ -35,7 +36,7 @@ export const getCash = async (userId) => {
 //팩 정보
 export const getPackInfoOne = async(id)=>{
     return await prisma.pack.findFirst({
-        where: { id },
+        where: { id: parseInt(id) },
         select: {
             name: true,
             price: true,
@@ -75,7 +76,8 @@ export const getPlayersByRank = async(rank) => {
         goalDecision: true,
         shootPower: true,
         defense: true,
-        stamina: true
+        stamina: true,
+        rank: true
       }
     });
   }
