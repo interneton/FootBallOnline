@@ -165,7 +165,7 @@
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
-                        },
+                        },  
                         body: JSON.stringify({ amount })
                     });
 
@@ -329,7 +329,7 @@
             document.getElementById('start-game-btn').addEventListener('click', async () => {
                 const token = localStorage.getItem('accessToken');
                 try {
-                    const response = await fetch(`${baseUrl}/game/start`, {
+                    const response = await fetch(`${baseUrl}/game/play`, {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${token}`
