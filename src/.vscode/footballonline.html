@@ -39,17 +39,17 @@
                 <h3>회원가입</h3>
                 <form id="signupForm">
                     <label for="signup-account">이메일:</label>
-                    <input type="email" id="signup-account" name="account" required> <!-- 이메일 입력 필드 -->
+                    <input type="email" id="signup-account" name="account" required>
                     <label for="signup-password">비밀번호:</label>
-                    <input type="password" id="signup-password" name="password" required> <!-- 비밀번호 입력 필드 -->
+                    <input type="password" id="signup-password" name="password" required>
                     <br>
                     <label for="signup-name">이름:</label>
-                    <input type="text" id="signup-name" name="name" required> <!-- 이름 입력 필드 -->
+                    <input type="text" id="signup-name" name="name" required>
                     <label for="signup-teamName">팀 이름:</label>
-                    <input type="text" id="signup-teamName" name="teamName" required> <!-- 팀 이름 입력 필드 -->
-                    <button type="submit" class="btn">회원가입</button> <!-- 회원가입 버튼 -->
+                    <input type="text" id="signup-teamName" name="teamName" required>
+                    <button type="submit" class="btn">회원가입</button>
                 </form>
-                <p id="signup-message"></p> <!-- 회원가입 메시지 표시 -->
+                <p id="signup-message"></p>
             </div>
         </section>
 
@@ -59,24 +59,25 @@
             <button id="buy-cash-100-btn" class="btn">100 캐시 구매하기</button>
             <button id="buy-cash-500-btn" class="btn">500 캐시 구매하기</button>
             <button id="buy-cash-1000-btn" class="btn">1000 캐시 구매하기</button>
-            <p id="cash-amount">보유 캐시: </p>
+            <h3>보유 캐시: <span id="cash-amount"></span></h3>
         </section>
 
         <!-- 가챠 섹션 -->
         <section id="shop-section" style="display: none;">
             <h2>가챠 상점</h2>
             <p>사용 가능한 팩을 선택하여 선수를 뽑으세요.</p>
-            <select id="pack-select"></select> <!-- 팩 선택 -->
+            <select id="pack-select"></select>
             <button id="draw-player-1-btn" class="btn">1회 뽑기 (100 캐시)</button>
             <button id="draw-player-5-btn" class="btn">5회 뽑기 (500 캐시)</button>
             <button id="draw-player-10-btn" class="btn">10회 뽑기 (1000 캐시)</button>
             <p id="draw-result">선수 뽑기 결과가 여기에 표시됩니다.</p>
-            <p id="cash-amount">보유 캐시: </p>
+            <h3>보유 캐시: <span id="cash-amount"></span></h3>
         </section>
 
         <!-- 선수 관리 섹션 -->
         <section id="player-section" style="display: none;">
             <h2>나만의 팀 구성</h2>
+            <button id="show-my-players-btn" class="btn">내 선수 목록 보기</button>
             <div>
                 <h3>장착된 선수 목록 (최대 3명)</h3>
                 <ul id="equipped-players-list"></ul>
@@ -88,7 +89,6 @@
                 <button id="unequip-player-btn" class="btn">선수 해제하기</button>
             </div>
         </section>
-
         <!-- 경기 섹션 -->
         <section id="game-section" style="display: none;">
             <h2>경기 시작</h2>
@@ -132,6 +132,8 @@
                     showGameSections();
                     document.getElementById('cashShop-section').style.display = 'block';
                     document.getElementById('signup-section').style.display = 'none';
+                    document.getElementById('logout-btn').style.display = 'block';
+                    document.getElementById('player-section').style.display = 'block';
                 } catch (error) {
                     document.getElementById('login-message').textContent = `오류: ${error.message}`;
                 }
@@ -148,6 +150,7 @@
                 document.getElementById('login-message').textContent = '';
                 document.getElementById('signup-section').style.display = 'block';
                 document.getElementById('cashShop-section').style.display = 'none';
+                document.getElementById('player-section').style.display = 'none';
             });
 
             // 캐시 구매 처리
@@ -158,7 +161,6 @@
             async function purchaseCash(amount) {
                 const token = localStorage.getItem('accessToken');
                 if (!token) return;
-
                 try {
                     const response = await fetch(`${baseUrl}/shop/purchase`, {
                         method: 'POST',
@@ -170,54 +172,44 @@
                     });
 
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`캐시 구매 실패: ${errorText}`);
+                        const errorText = await response.json();
+                        throw new Error(errorText.message);
                     }
 
-                    const { cash } = await response.json();
-                    document.getElementById('cash-amount').textContent = `보유 캐시: ${cash}`;
-                    alert(`${amount} 캐시를 성공적으로 구매했습니다.`);
+                    await getCashAmount(); // 캐시 잔액 갱신
                 } catch (error) {
-                    alert(`오류: ${error.message}`);
+                    console.error('캐시 구매에 실패했습니다:', error);
                 }
             }
-
-            // 팩 정보 가져오기 및 팩 선택
-            async function fetchPacks() {
-                const token = localStorage.getItem('accessToken');
-                if (!token) return;
-
+            // 캐시 잔액 조회 함수
+            async function getCashAmount() {
                 try {
-                    const response = await fetch(`${baseUrl}/shop/getPacks`, {
+                    const response = await fetch(`${baseUrl}/shop/getCashAmount`, {
                         method: 'GET',
                         headers: {
-                            'Authorization': `Bearer ${token}`
+                            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
                         }
                     });
 
-                    const packs = await response.json();
-                    const packSelect = document.getElementById('pack-select');
-                    packs.forEach(pack => {
-                        const option = document.createElement('option');
-                        option.value = pack.id;
-                        option.text = `${pack.name} (가격: ${pack.price} 캐시)`;
-                        packSelect.appendChild(option);
-                    });
+                    if (!response.ok) {
+                        throw new Error('캐시 잔액을 불러오는 데 실패했습니다.');
+                    }
+
+                    const data = await response.json();
+                    document.getElementById('cash-amount').textContent = `${data.cashAmount} 캐시`;
                 } catch (error) {
-                    alert(`팩 정보를 불러오는 데 실패했습니다: ${error.message}`);
+                    console.error(error);
                 }
             }
 
-            // 선수 뽑기 처리
-            document.getElementById('draw-player-1-btn').addEventListener('click', () => drawPlayer(1));
-            document.getElementById('draw-player-5-btn').addEventListener('click', () => drawPlayer(5));
-            document.getElementById('draw-player-10-btn').addEventListener('click', () => drawPlayer(10));
+            // 가챠 뽑기 처리
+            document.getElementById('draw-player-1-btn').addEventListener('click', () => drawPlayers(1));
+            document.getElementById('draw-player-5-btn').addEventListener('click', () => drawPlayers(5));
+            document.getElementById('draw-player-10-btn').addEventListener('click', () => drawPlayers(10));
 
-            async function drawPlayer(count) {
+            async function drawPlayers(count) {
                 const token = localStorage.getItem('accessToken');
-                const packId = document.getElementById('pack-select').value;
-                if (!token || !packId) return;
-
+                if (!token) return;
                 try {
                     const response = await fetch(`${baseUrl}/shop/draw`, {
                         method: 'POST',
@@ -225,63 +217,54 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ packId, count })
+                        body: JSON.stringify({ packId: 1 })
                     });
 
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`선수 뽑기 실패: ${errorText}`);
+                        const errorText = await response.json();
+                        throw new Error(errorText.message);
                     }
 
-                    const { selectedPlayers, cash } = await response.json();
-                    document.getElementById('draw-result').textContent = `뽑힌 선수들: ${selectedPlayers.map(p => p.name).join(', ')}`;
-                    document.getElementById('cash-amount').textContent = `보유 캐시: ${cash}`;
+                    const data = await response.json();
+                    document.getElementById('draw-result').textContent = `당첨된 선수: ${data.players.join(', ')}`;
+                    await getCashAmount(); // 캐시 잔액 갱신
                 } catch (error) {
-                    alert(`오류: ${error.message}`);
+                    console.error('선수 뽑기에 실패했습니다:', error);
                 }
             }
-
-            // 장착된 선수 목록 및 전체 선수 목록 불러오기
-            async function fetchPlayers() {
+            // 내 선수 목록 보기 처리
+            document.getElementById('show-my-players-btn').addEventListener('click', async () => {
                 const token = localStorage.getItem('accessToken');
                 if (!token) return;
-
                 try {
-                    const [equippedPlayers, allPlayers] = await Promise.all([
-                        fetch(`${baseUrl}/players/equipped`, {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        }).then(res => res.json()),
-                        fetch(`${baseUrl}/players/all`, {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        }).then(res => res.json())
-                    ]);
-
-                    const equippedPlayersList = document.getElementById('equipped-players-list');
-                    equippedPlayersList.innerHTML = '';
-                    equippedPlayers.forEach(player => {
-                        const li = document.createElement('li');
-                        li.textContent = `${player.name} (속력: ${player.speed}, 골 결정력: ${player.goalDecision})`;
-                        equippedPlayersList.appendChild(li);
+                    const response = await fetch(`${baseUrl}/players/getInvenPlayer`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
                     });
 
+                    if (!response.ok) {
+                        throw new Error('내 선수 목록을 불러오는 데 실패했습니다.');
+                    }
+
+                    const data = await response.json();
                     const allPlayersList = document.getElementById('all-players-list');
-                    allPlayersList.innerHTML = '';
-                    allPlayers.forEach(player => {
-                        const li = document.createElement('li');
-                        li.textContent = `${player.name} (속력: ${player.speed}, 골 결정력: ${player.goalDecision})`;
-                        li.dataset.playerId = player.soccerPlayerId;
-                        allPlayersList.appendChild(li);
+                    allPlayersList.innerHTML = ''; // 초기화
+                    data.players.forEach(player => {
+                        const option = document.createElement('li'); // li로 변경하여 목록으로 표시
+                        option.textContent = player;
+                        allPlayersList.appendChild(option);
                     });
                 } catch (error) {
-                    alert(`선수 정보를 불러오는 데 실패했습니다: ${error.message}`);
+                    console.error(error);
                 }
-            }
+            });
 
-            // 선수 장착 및 해제 기능
+            // 선수 장착 처리
             document.getElementById('equip-player-btn').addEventListener('click', async () => {
-                const selectedPlayerId = document.querySelector('#all-players-list li.selected')?.dataset?.playerId;
-                if (!selectedPlayerId) return alert('장착할 선수를 선택하세요.');
-
+                const selectedPlayer = document.getElementById('all-players-list').value;
+                if (!selectedPlayer) return;
                 const token = localStorage.getItem('accessToken');
                 try {
                     const response = await fetch(`${baseUrl}/players/equip`, {
@@ -290,24 +273,25 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ soccerPlayerId: selectedPlayerId })
+                        body: JSON.stringify({ player: selectedPlayer })
                     });
 
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`선수 장착 실패: ${errorText}`);
+                        const errorText = await response.json();
+                        throw new Error(errorText.message);
                     }
 
-                    await fetchPlayers(); // 선수 목록 다시 불러오기
+                    // 선수 장착 후 갱신
+                    await getEquippedPlayers();
                 } catch (error) {
-                    alert(`선수 장착 실패: ${error.message}`);
+                    console.error('선수 장착에 실패했습니다:', error);
                 }
             });
 
+            // 선수 해제 처리
             document.getElementById('unequip-player-btn').addEventListener('click', async () => {
-                const selectedPlayerId = document.querySelector('#equipped-players-list li.selected')?.dataset?.playerId;
-                if (!selectedPlayerId) return alert('해제할 선수를 선택하세요.');
-
+                const selectedPlayer = document.getElementById('equipped-players-list').value;
+                if (!selectedPlayer) return;
                 const token = localStorage.getItem('accessToken');
                 try {
                     const response = await fetch(`${baseUrl}/players/unequip`, {
@@ -316,50 +300,112 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ soccerPlayerId: selectedPlayerId })
+                        body: JSON.stringify({ player: selectedPlayer })
                     });
 
                     if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`선수 장착 해제 실패: ${errorText}`);
+                        const errorText = await response.json();
+                        throw new Error(errorText.message);
                     }
 
-                    await fetchPlayers(); // 선수 목록 다시 불러오기
+                    // 선수 해제 후 갱신
+                    await getEquippedPlayers();
                 } catch (error) {
-                    alert(`선수 장착 해제 실패: ${error.message}`);
+                    console.error('선수 해제에 실패했습니다:', error);
                 }
             });
 
-            // 경기 시작 버튼
-            document.getElementById('start-game-btn').addEventListener('click', async () => {
+            // 장착된 선수 조회
+            async function getEquippedPlayers() {
                 const token = localStorage.getItem('accessToken');
-                if (!token) return;
-
                 try {
-                    const response = await fetch(`${baseUrl}/game/play`, {
-                        method: 'POST',
-                        headers: { 'Authorization': `Bearer ${token}` }
+                    const response = await fetch(`${baseUrl}/players/getEquipped`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
                     });
 
-                    const { result } = await response.json();
-                    document.getElementById('game-result-text').textContent = `경기 결과: ${result}`;
+                    if (!response.ok) {
+                        throw new Error('장착된 선수를 불러오는 데 실패했습니다.');
+                    }
+
+                    const data = await response.json();
+                    const equippedPlayersList = document.getElementById('equipped-players-list');
+                    equippedPlayersList.innerHTML = ''; // 초기화
+                    data.players.forEach(player => {
+                        const option = document.createElement('option');
+                        option.value = player;
+                        option.textContent = player;
+                        equippedPlayersList.appendChild(option);
+                    });
                 } catch (error) {
-                    alert(`경기 시작 실패: ${error.message}`);
+                    console.error(error);
+                }
+            }
+
+            // 모든 선수 조회
+            async function getAllPlayers() {
+                const token = localStorage.getItem('accessToken');
+                try {
+                    const response = await fetch(`${baseUrl}/players`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('모든 선수를 불러오는 데 실패했습니다.');
+                    }
+
+                    const data = await response.json();
+                    const allPlayersList = document.getElementById('all-players-list');
+                    allPlayersList.innerHTML = ''; // 초기화
+                    data.players.forEach(player => {
+                        const option = document.createElement('option');
+                        option.value = player;
+                        option.textContent = player;
+                        allPlayersList.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+
+            // 경기 시작 처리
+            document.getElementById('start-game-btn').addEventListener('click', async () => {
+                const token = localStorage.getItem('accessToken');
+                try {
+                    const response = await fetch(`${baseUrl}/game/start`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.json();
+                        throw new Error(errorText.message);
+                    }
+
+                    const data = await response.json();
+                    document.getElementById('game-result-text').textContent = data.result;
+                } catch (error) {
+                    console.error('경기 시작에 실패했습니다:', error);
                 }
             });
 
-            // 게임 섹션 표시
+            // 섹션 표시 제어 함수
             function showGameSections() {
                 document.getElementById('auth-section').style.display = 'none';
                 document.getElementById('cashShop-section').style.display = 'block';
                 document.getElementById('shop-section').style.display = 'block';
                 document.getElementById('player-section').style.display = 'block';
                 document.getElementById('game-section').style.display = 'block';
-                document.getElementById('logout-btn').style.display = 'block';
-
-                // 팩 목록 및 선수 목록 불러오기
-                fetchPacks();
-                fetchPlayers();
+                getCashAmount();
+                getAllPlayers();
+                getEquippedPlayers();
             }
         });
     </script>
