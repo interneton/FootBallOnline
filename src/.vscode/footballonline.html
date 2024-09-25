@@ -69,6 +69,7 @@
             <div class="scroll-container">
                 <div id="pack-buttons" class="pack-buttons"></div>
             </div>
+            <p id="grade-probability" style="display: none;">등급 확률: </p>
             <button id="draw-player-1-btn" class="btn">1회 뽑기</button>
             <button id="draw-player-5-btn" class="btn">5회 뽑기</button>
             <button id="draw-player-10-btn" class="btn">10회 뽑기</button>
@@ -233,6 +234,8 @@
                 }
             }
 
+            let packProbabilities = {};
+            
             // 가챠 뽑기 처리
             async function loadPacks() {
                 try {
@@ -253,6 +256,14 @@
                     packButtonsContainer.innerHTML = ''; // 기존 팩 버튼 삭제
 
                     packs.forEach(pack => {
+                    packProbabilities[pack.id] = {
+                        SSPB: pack.SSPB,
+                        APB: pack.APB,
+                        BPB: pack.BPB,
+                        CPB: pack.CPB,
+                        FPB: pack.FPB
+                    };
+
                     // Create pack button element
                     const packButton = document.createElement('div');
                     packButton.classList.add('pack-button');
@@ -273,10 +284,21 @@
                     packPrice.classList.add('pack-price');
                     packPrice.textContent = `${pack.price} 캐시`;
 
+                    const packProbability = document.createElement('div');
+                    packProbability.classList.add('pack-probability');
+                    packProbability.innerHTML = `
+                        <small>SS: ${pack.SSPB}%</small><br>
+                        <small>A: ${pack.APB}%</small><br>
+                        <small>B: ${pack.BPB}%</small><br>
+                        <small>C: ${pack.CPB}%</small><br>
+                        <small>F: ${pack.FPB}%</small>
+                    `;
+
                     // Append elements to the pack button
                     packButton.appendChild(packImage);
                     packButton.appendChild(packName);
                     packButton.appendChild(packPrice);
+                    packButton.appendChild(packProbability);
 
                     // Add event listener to the pack button
                     packButton.addEventListener('click', () => selectPack(pack.id, packButton));
@@ -299,6 +321,24 @@
                 packButtons.forEach(btn => btn.classList.remove('selected'));
 
                 button.classList.add('selected');
+
+                // Display grade probability for the selected pack
+                const gradeProbabilityElement = document.getElementById('grade-probability');
+                const probability = packProbabilities[packId];
+                
+                if (probability) {
+                    gradeProbabilityElement.innerHTML = `
+                        등급 확률: 
+                        <small>SS: ${probability.SSPB}%, 
+                        A: ${probability.APB}%, 
+                        B: ${probability.BPB}%, 
+                        C: ${probability.CPB}%, 
+                        F: ${probability.FPB}%</small>
+                    `;
+                    gradeProbabilityElement.style.display = 'block'; // Show the probability
+                } else {
+                    gradeProbabilityElement.style.display = 'none'; // Hide if no probability data
+                }
             }
 
             document.getElementById('draw-player-1-btn').addEventListener('click', () => drawPlayers(1));
