@@ -78,14 +78,20 @@
         <!-- 선수 관리 섹션 -->
         <section id="player-section" style="display: none;">
             <h2>나만의 팀 구성</h2>
-            <button id="show-my-players-btn" class="btn">내 선수 목록 보기</button>
+            <div id="hideBtn" style="display: none;">
+                <button id="show-my-players-btn" class="btn">내 선수 목록 보기</button>
+            </div>
+            <button id="hide-my-players-btn" class="btn">내 선수 목록 숨기기</button>
+
             <div>
                 <h3>장착된 선수 목록 (최대 3명)</h3>
                 <ul id="equipped-players-list"></ul>
             </div>
-            <div>
-                <h3>모든 선수 목록</h3>
-                <ul id="all-players-list"></ul>
+            <div id="showPlayerList" style="display: block;">
+                <div>
+                    <h3>모든 선수 목록</h3>
+                    <ul id="all-players-list"></ul>
+                </div>
             </div>
         </section>
         <!-- 경기 섹션 -->
@@ -165,6 +171,17 @@
                 document.getElementById('signup-section').style.display = 'block';
                 document.getElementById('cashShop-section').style.display = 'none';
                 document.getElementById('player-section').style.display = 'none';
+            });
+            // 내 선수 목록 보기
+            document.getElementById('show-my-players-btn').addEventListener('click', () => {
+                document.getElementById('showPlayerList').style.display = 'block';
+                document.getElementById('hideBtn').style.display = 'none';
+                document.getElementById('hide-my-players-btn').style.display = 'block';
+            });
+            document.getElementById('hide-my-players-btn').addEventListener('click', () => {
+                document.getElementById('showPlayerList').style.display = 'none';
+                document.getElementById('hide-my-players-btn').style.display = 'none';
+                document.getElementById('hideBtn').style.display = 'block';
             });
 
             // 캐시 구매 처리
