@@ -91,7 +91,7 @@
             <div id="showPlayerList" style="display: block;">
                 <div>
                     <h3>모든 선수 목록</h3>
-                    <ul id="all-players-list"></ul>
+                    <p id="all-players-list"></p>
                 </div>
             </div>
         </section>
@@ -108,7 +108,7 @@
         <!-- 랭킹 섹션 -->
         <section id="ranking-section" style="display: none;">
             <h2>랭킹</h2>
-            <ul id="ranking-list"></ul>
+            <p id="ranking-list"></p>
         </section>
 
         <!-- 알림 섹션 -->
@@ -172,6 +172,21 @@
                 document.getElementById('signup-section').style.display = 'block';
                 document.getElementById('cashShop-section').style.display = 'none';
                 document.getElementById('player-section').style.display = 'none';
+            });
+            // 회원가입 처리
+            document.getElementById('signupForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const account = document.getElementById('signup-account').value;
+                const password = document.getElementById('signup-password').value;
+                const name = document.getElementById('signup-name').value;
+                const teamName = document.getElementById('signup-teamName').value;
+
+                try {
+                    await signupService(account, password, name, teamName);
+                    document.getElementById('signup-message').textContent = '회원가입 성공! 로그인하세요.';
+                } catch (error) {
+                    document.getElementById('signup-message').textContent = `오류: ${error.message}`;
+                }
             });
             // 내 선수 목록 보기
             document.getElementById('show-my-players-btn').addEventListener('click', () => {
@@ -437,7 +452,7 @@
                     inventoryPlayersList.innerHTML = '';
 
                     data.players.forEach(player => {
-                        const listItem = document.createElement('li');
+                        const listItem = document.createElement('ol');
                         listItem.style.border = '1px solid #ddd';
                         listItem.style.padding = '10px';
                         listItem.style.marginBottom = '10px';
@@ -577,7 +592,7 @@
                     rankingList.innerHTML = '';
 
                     data.forEach((player, index) => {
-                        const listItem = document.createElement('li');
+                        const listItem = document.createElement('ol');
                         listItem.textContent = `${index + 1}. ${player.name} - ${player.score} 점`;
                         listItem.style.border = '1px solid #ddd';
                         listItem.style.padding = '10px';
