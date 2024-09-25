@@ -110,11 +110,21 @@ export const getUsername = async (userId) => {
   }
 };
 
-export const rankings = async()=>{
+export const rankings = async () => {
   return await prisma.user.findMany({
     select: {
       name: true,
       score: true,
+      matchManager: {
+        select: {
+          winCount: true,
+          lossCount: true,
+          drawCount: true,
+        },
+      },
+    },
+    orderBy: {
+      score: 'desc',
     },
   });
-}
+};

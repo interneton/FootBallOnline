@@ -592,7 +592,9 @@
                 try {
                     const response = await fetch(`${baseUrl}/game/ranking`, {
                         method: 'GET',
-                        
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
                     });
 
                     if (!response.ok) {
@@ -604,13 +606,26 @@
                     rankingList.innerHTML = '';
 
                     data.forEach((player, index) => {
-                        const listItem = document.createElement('ol');
-                        listItem.textContent = `${index + 1}. ${player.name} - ${player.score} 점`;
+                        const listItem = document.createElement('li');
+                        const winCount = player.matchManager?.winCount ?? 0;
+                        const lossCount = player.matchManager?.lossCount ?? 0;
+                        const drawCount = player.matchManager?.drawCount ?? 0;
+                        listItem.textContent = `${index + 1}. ${player.name} - ${player.score} 점 (승: ${winCount}, 패: ${lossCount}, 무: ${drawCount})`;
                         listItem.style.border = '1px solid #ddd';
                         listItem.style.padding = '10px';
                         listItem.style.margin = '5px 0';
                         listItem.style.borderRadius = '5px';
                         listItem.style.backgroundColor = '#f9f9f9';
+                        listItem.style.display = 'flex';
+                        listItem.style.justifyContent = 'space-between';
+
+                        const resultSpan = document.createElement('span');
+                        resultSpan.textContent = `(승: ${winCount}, 패: ${lossCount}, 무: ${drawCount})`;
+                        resultSpan.style.marginLeft = 'auto';
+
+                        listItem.textContent = `${index + 1}. ${player.name} - ${player.score} 점 `;
+                        listItem.appendChild(resultSpan);
+
                         rankingList.appendChild(listItem);
                     });
                 } catch (error) {

@@ -17,7 +17,7 @@ model User {
   score       Int          @default(1000) @map("score")
 
   userPlayers UserPlayer[] 
-  matchManager MatchManager[] // MatchManager와의 관계 추가
+  matchManager MatchManager? // MatchManager와의 관계 수정
 
   @@map("users")
 }
@@ -27,7 +27,7 @@ model MatchManager {
   winCount    Int      @default(0) @map("win_count")  // 승리 카운트
   lossCount   Int      @default(0) @map("loss_count")  // 패배 카운트
   drawCount   Int      @default(0) @map("draw_count")  // 무승부 카운트
-  userId      Int      @map("user_id")
+  userId      Int      @unique @map("user_id") // userId를 unique로 설정
 
   user        User     @relation(fields: [userId], references: [userId], onDelete: Cascade)
   @@map("match_managers")
