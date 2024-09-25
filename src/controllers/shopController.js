@@ -7,7 +7,9 @@ export const purchaseCash = async (req, res, next) => {
   const { amount } = req.body;
 
   try {
-    const result = await purch(userId, amount);
+    const currentCash = await getCash(userId);
+    const newAmount = currentCash + amount;
+    const result = await purch(userId, newAmount);
     res.status(200).json({ message: "캐시 구매 완료", cash: result });
   } catch (error) {
     next(error); 
