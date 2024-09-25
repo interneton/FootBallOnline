@@ -104,6 +104,14 @@
             <ul id="ranking-list"></ul>
         </section>
 
+        <!-- 알림 섹션 -->
+        <div id="modal-notification" class="modal-notification" style="display: none;">
+            <div class="modal-content">
+                <span id="modal-close-btn" class="modal-close-btn">&times;</span>
+                <p id="modal-notification-message"></p>
+            </div>
+        </div>
+
     </main>
 
     <footer>
@@ -390,6 +398,13 @@
             async function equipPlayer(soccerPlayerId) {
                 const token = localStorage.getItem('accessToken');
                 try {
+
+                    const equippedPlayersList = document.getElementById('equipped-players-list');
+                    if (equippedPlayersList.childElementCount >= 3) {
+                        showModalNotification('장착할 수 있는 선수는 최대 3명입니다.');
+                        return;
+                    }
+
                     const response = await fetch(`${baseUrl}/players/equip`, {
                         method: 'POST',
                         headers: {
@@ -439,6 +454,13 @@
             document.getElementById('start-game-btn').addEventListener('click', async () => {
                 const token = localStorage.getItem('accessToken');
                 try {
+
+                    const equippedPlayersList = document.getElementById('equipped-players-list');
+                    if (equippedPlayersList.childElementCount < 3) {
+                        showModalNotification('게임을 진행하려면 선수 3명을 장착해야 합니다');
+                        return;
+                    }
+
                     const response = await fetch(`${baseUrl}/game/play`, {
                         method: 'POST',
                         headers: {
@@ -499,6 +521,25 @@
                 document.getElementById('ranking-section').style.display = 'block';
                 getCashAmount();
                 loadRanking();
+            }
+
+            function showModalNotification(message) {
+            const modalNotification = document.getElementById('modal-notification');
+            const modalNotificationMessage = document.getElementById('modal-notification-message');
+
+            modalNotificationMessage.textContent = message;
+            modalNotification.style.display = 'flex'; // Show the modal
+
+            // Close the modal when the close button is clicked
+            document.getElementById('modal-close-btn').addEventListener('click', () => {
+                modalNotification.style.display = 'none';
+            });
+
+            // Optional: Close the modal when clicking outside of the modal content
+            window.addEventListener('click', (event) => {
+                if (event.target === modalNotification) {
+                    modalNotification.style.display = 'none';
+                }            });
             }
         });
     </script>
