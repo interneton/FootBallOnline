@@ -252,15 +252,38 @@
 
                     packButtonsContainer.innerHTML = ''; // 기존 팩 버튼 삭제
 
-                    packs.forEach(pack => {           
-                        const packButton = document.createElement('button');
-                        packButton.classList.add('pack-button');
-                        packButton.innerHTML = `${pack.name}<br>${pack.price} 캐시`;
-                        packButton.dataset.packId = pack.id; // 팩 ID를 데이터 속성으로 설정
+                    packs.forEach(pack => {
+                    // Create pack button element
+                    const packButton = document.createElement('div');
+                    packButton.classList.add('pack-button');
+                    packButton.dataset.packId = pack.id; // Set pack ID
 
-                        packButton.addEventListener('click', () => selectPack(pack.id, packButton));
-                        packButtonsContainer.appendChild(packButton);
-                    });
+                    // Create pack image element
+                    const packImage = document.createElement('img');
+                    packImage.classList.add('pack-image');
+                    packImage.src = "/images/packImage.png" // Assuming `pack.image` contains the image URL
+
+                    // Create pack name element
+                    const packName = document.createElement('div');
+                    packName.classList.add('pack-name');
+                    packName.textContent = pack.name;
+
+                    // Create pack price element
+                    const packPrice = document.createElement('div');
+                    packPrice.classList.add('pack-price');
+                    packPrice.textContent = `${pack.price} 캐시`;
+
+                    // Append elements to the pack button
+                    packButton.appendChild(packImage);
+                    packButton.appendChild(packName);
+                    packButton.appendChild(packPrice);
+
+                    // Add event listener to the pack button
+                    packButton.addEventListener('click', () => selectPack(pack.id, packButton));
+
+                    // Append the pack button to the container
+                    packButtonsContainer.appendChild(packButton);
+                });
 
                 } catch (error) {
                     console.error('팩 로딩 중 에러 발생:', error);
